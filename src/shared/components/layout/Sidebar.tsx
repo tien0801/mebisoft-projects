@@ -1,6 +1,6 @@
 /**
  * @file Sidebar.tsx
- * @description Sidebar component với dropdown menu và responsive
+ * @description Sidebar component - Giữ thiết kế gốc, chỉ Dashboard & Projects
  * @author Mebisoft Team
  * @created 2025-11-22
  */
@@ -8,168 +8,153 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/features/auth';
+import '@/css/sidebar.css';
 
-// Interface cho menu item
-interface MenuItem {
+type MenuItem = {
   name: string;
-  href?: string;
-  icon: string;
-  children?: { name: string; href: string }[];
-}
+  href: string;
+  iconPath: string;
+  group?: string;
+  parent?: string;
+};
 
-// Cấu trúc menu với dropdown
-const menuItems: MenuItem[] = [
-  {
-    name: 'Dashboard',
-    icon: '📊',
-    children: [
-      { name: 'Projects', href: '/dashboard' },
-      { name: 'Overview', href: '/dashboard/overview' },
-    ],
-  },
-  { name: 'Khách Hàng', href: '/customers', icon: '👥' },
-  { name: 'Nhân Viên', href: '/employees', icon: '👨‍💼' },
-  { name: 'Báo Cáo', href: '/reports', icon: '📈' },
-  { name: 'Cài Đặt', href: '/settings', icon: '⚙️' },
+// Menu items - CHỈ Dashboard và Projects
+export const menuItems: MenuItem[] = [
+  { name: 'Dashboard', href: '/dashboard', iconPath: '/images/sidebar/hrm_system.svg' },
+  { name: 'Project System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
+  { name: 'Projects', href: '/projects', iconPath: '/images/sidebar/Project_system.svg', group: 'Project System' },
 ];
 
-interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname();
-  // State để quản lý menu nào đang mở
-  const [openMenus, setOpenMenus] = useState<string[]>(['Dashboard']);
+  const { user } = useAuth();
 
-  // Toggle dropdown menu
-  const toggleMenu = (menuName: string) => {
-    setOpenMenus((prev) =>
-      prev.includes(menuName)
-        ? prev.filter((name) => name !== menuName)
-        : [...prev, menuName]
-    );
-  };
+  const grouped = menuItems.reduce<Record<string, MenuItem[]>>((acc, item) => {
+    const key = item.group || '__root__';
+    acc[key] = acc[key] || [];
+    acc[key].push(item);
+    return acc;
+  }, {});
+
+  const rootItems = grouped['__root__'] || [];
+  const dashboardItem = rootItems.find((i) => i.name === 'Dashboard');
+  const otherRootItems = rootItems.filter((i) => i.name !== 'Dashboard');
+  
+  const displayedItems: Array<MenuItem & { isSyntheticGroup?: boolean }> = [];
+  if (dashboardItem) displayedItems.push(dashboardItem);
+  displayedItems.push(...otherRootItems);
+
+  // Mặc định Dashboard luôn mở khi có child active
+  const dashChildren = grouped['Dashboard'] || [];
+  const dashActive = dashChildren.some((c) => c.href !== '#' && pathname.startsWith(c.href));
+  
+  const [openMap, setOpenMap] = useState<Record<string, boolean>>(() => {
+    const map: Record<string, boolean> = {};
+    if (dashActive) map['Dashboard'] = true;
+    return map;
+  });
+  
+  // Toggle: Click để đóng/mở
+  const toggleOpen = (key: string) => setOpenMap((s) => ({ ...s, [key]: !s[key] }));
+
+  const chevronRight = '/images/sidebar/chevron_right.svg';
+  const chevronDown = '/images/sidebar/chevron_down.svg';
 
   return (
-    <>
-      {/* Overlay cho mobile */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-gray-500 bg-opacity-50 z-40 lg:hidden"
-          onClick={onClose}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          'fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300',
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        )}
-      >
-        {/* Logo */}
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">Mebisoft</h2>
-            <p className="text-sm text-gray-500">Project Management</p>
-          </div>
-          {/* Close button cho mobile */}
-          <button
-            onClick={onClose}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
-          >
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+    <aside className={cn('sidebar', 'flex flex-col')}>
+      {/* Logo */}
+      <div className="brand">
+        <div className="brandLogo">
+          <Image src="/images/logo/logo.png" alt="Mebisoft" width={180} height={64} />
         </div>
+      </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <ul className="space-y-1">
-            {menuItems.map((item) => {
-              const hasChildren = item.children && item.children.length > 0;
-              const isOpen = openMenus.includes(item.name);
-              const isActive = item.href ? pathname === item.href : false;
+      {/* Navigation */}
+      <nav className="menuWrapper">
+        <div className="menuBlock">
+          <ul className="menuList">
+            {displayedItems.map((item, index) => {
+              const key = item.name + (item.href || index);
+              const isActive = pathname === item.href;
+              const isDropdown = item.name === 'Project System';
+              const children = grouped[item.name] || [];
+              const hasActiveChild = children.some((c) => c.href !== '#' && pathname.startsWith(c.href));
+              const opened = !!openMap[item.name] || hasActiveChild;
+
+              if (isDropdown) {
+                const rootChildren = children.filter((c) => !c.parent);
+
+                return (
+                  <li key={key}>
+                    <div className="dropdown">
+                      {/* Dashboard button - Click để toggle đóng/mở */}
+                      <button
+                        type="button"
+                        onClick={() => toggleOpen(item.name)}
+                        className={cn('menuItem', 'dropdownToggle', opened && 'active')}
+                      >
+                        <div className="dropdownLabel">
+                          <span className="icon">
+                            <Image src={item.iconPath} alt={item.name} width={36} height={36} />
+                          </span>
+                          <span className="label">{item.name}</span>
+                        </div>
+
+                        <span className="caret">
+                          <Image
+                            src={opened ? chevronDown : chevronRight}
+                            alt={opened ? 'Collapse' : 'Expand'}
+                            width={16}
+                            height={16}
+                            className="chevronIcon"
+                          />
+                        </span>
+                      </button>
+
+                      {/* Submenu - Projects */}
+                      {opened && rootChildren.length > 0 && (
+                        <ul className="menuListNested">
+                          {rootChildren.map((c) => {
+                            const childActive = pathname === c.href;
+                            return (
+                              <li key={c.href}>
+                                <Link
+                                  href={c.href}
+                                  className={cn('menuItem', 'nested', childActive && 'active')}
+                                >
+                                  <span className="label">{c.name}</span>
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </div>
+                  </li>
+                );
+              }
 
               return (
-                <li key={item.name}>
-                  {/* Menu item chính */}
-                  {hasChildren ? (
-                    // Menu có dropdown
-                    <button
-                      onClick={() => toggleMenu(item.name)}
-                      className={cn(
-                        'w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-colors',
-                        'text-gray-700 hover:bg-gray-50'
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-xl">{item.icon}</span>
-                        <span>{item.name}</span>
-                      </div>
-                      {/* Arrow icon */}
-                      <ChevronDown
-                        className={cn(
-                          'w-4 h-4 transition-transform',
-                          isOpen && 'rotate-180'
-                        )}
-                      />
-                    </button>
-                  ) : (
-                    // Menu không có dropdown
-                    <Link
-                      href={item.href!}
-                      onClick={onClose}
-                      className={cn(
-                        'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                        isActive
-                          ? 'bg-blue-50 text-blue-600 font-medium'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      )}
-                    >
-                      <span className="text-xl">{item.icon}</span>
-                      <span>{item.name}</span>
-                    </Link>
-                  )}
-
-                  {/* Dropdown submenu */}
-                  {hasChildren && isOpen && (
-                    <ul className="mt-1 ml-4 space-y-1">
-                      {item.children!.map((child) => {
-                        const isChildActive = pathname === child.href;
-                        return (
-                          <li key={child.href}>
-                            <Link
-                              href={child.href}
-                              onClick={onClose}
-                              className={cn(
-                                'flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm',
-                                isChildActive
-                                  ? 'bg-blue-50 text-blue-600 font-medium'
-                                  : 'text-gray-600 hover:bg-gray-50'
-                              )}
-                            >
-                              <span className="w-2 h-2 rounded-full bg-current" />
-                              <span>{child.name}</span>
-                            </Link>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
+                <li key={key}>
+                  <Link href={item.href} className={cn('menuItem', isActive && 'active')}>
+                    <span className="icon">
+                      <Image src={item.iconPath} alt={item.name} width={36} height={36} />
+                    </span>
+                    <span className="label">{item.name}</span>
+                  </Link>
                 </li>
               );
             })}
           </ul>
-        </nav>
-      </aside>
-    </>
+        </div>
+      </nav>
+
+      {/* Footer removed - user info moved to header */}
+    </aside>
   );
 }

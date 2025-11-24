@@ -12,8 +12,10 @@ import { useProjectStore } from '../store/projectStore';
 import { ProjectCard } from './ProjectCard';
 import { ProjectListView } from './ProjectListView';
 import { ProjectToolbar } from './ProjectToolbar';
+import { CreateProjectModal, ProjectFormData } from './modal/CreateProjectModal';
 import { useRouter } from 'next/navigation';
-import { Project, ProjectStatus } from '../types/project.types';
+import { Project, ProjectStatus, ProjectMember } from '../types/project.types';
+import { MOCK_USERS } from '../data/mockMember';
 
 type ViewMode = 'grid' | 'list';
 type SortOption = 'newest' | 'oldest' | 'a-z' | 'z-a';
@@ -29,6 +31,7 @@ export function ProjectList() {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Lấy projects từ Zustand store
   const projects = useProjectStore((state) => state.projects);
@@ -79,9 +82,42 @@ export function ProjectList() {
     }
   };
 
+  const addProject = useProjectStore((state) => state.addProject);
+
   const handleCreate = () => {
-    console.log('Create new project');
-    alert('Tính năng tạo dự án mới - Coming soon!');
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCreateSubmit = (data: ProjectFormData) => {
+    // Tìm user đã chọn từ mock data
+    const selectedUser = MOCK_USERS.find(u => u.id === data.user);
+    
+    // Tạo members array từ user đã chọn
+    const members: ProjectMember[] = selectedUser ? [{
+      id: selectedUser.id,
+      name: selectedUser.name,
+      avatar: selectedUser.avatar,
+      role: selectedUser.role,
+    }] : [];
+
+    // Tạo project mới
+    const newProject: Project = {
+      id: `project-${Date.now()}`,
+      name: data.name,
+      description: data.description || 'No description provided',
+      status: data.status,
+      startDate: data.startDate || new Date().toISOString().split('T')[0],
+      endDate: data.endDate || new Date().toISOString().split('T')[0],
+      members: members, // Thêm user đã chọn vào members
+      clientId: data.client,
+      managerId: data.user,
+    };
+
+    // Thêm vào store
+    addProject(newProject);
+    
+    // Hiển thị thông báo
+    alert(`✅ Đã tạo dự án: ${data.name}`);
   };
 
   // Empty state
@@ -100,6 +136,12 @@ export function ProjectList() {
         <div className="flex items-center justify-center h-64 bg-white rounded-lg border border-gray-200">
           <div className="text-gray-500">Không tìm thấy dự án nào</div>
         </div>
+        
+        <CreateProjectModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={handleCreateSubmit}
+        />
       </>
     );
   }
@@ -142,6 +184,13 @@ export function ProjectList() {
           onDelete={handleDelete}
         />
       )}
+
+      {/* Create Modal */}
+      <CreateProjectModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateSubmit}
+      />
     </>
   );
 }

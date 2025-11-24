@@ -1,8 +1,8 @@
 /**
  * @file LoginForm.tsx
- * @description LoginForm component
- * @author Kindy
- * @created 2025-11-16
+ * @description LoginForm component - Với mock data
+ * @author Mebisoft Team
+ * @created 2025-11-22
  */
 
 'use client';
@@ -14,9 +14,9 @@ import { Input, Button } from '@/shared/components/ui';
 
 export function LoginForm() {
   const router = useRouter();
-  const { login, loading } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { loginMock, loading } = useAuth();
+  const [email, setEmail] = useState('admin@example.com');
+  const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,11 +29,18 @@ export function LoginForm() {
     }
 
     try {
-      await login({ email, password });
+      // Sử dụng loginMock thay vì login
+      loginMock({ email, password });
       router.push('/dashboard');
     } catch (err) {
-      setError('Đăng nhập thất bại. Vui lòng thử lại.');
+      setError(err instanceof Error ? err.message : 'Đăng nhập thất bại. Vui lòng thử lại.');
     }
+  };
+
+  // Quick login buttons
+  const quickLogin = (email: string, password: string) => {
+    setEmail(email);
+    setPassword(password);
   };
 
   return (
@@ -43,6 +50,41 @@ export function LoginForm() {
           {error}
         </div>
       )}
+
+      {/* Mock accounts info */}
+      <div className="p-3 bg-blue-50 border border-blue-200 rounded-md text-sm">
+        <p className="font-semibold text-blue-800 mb-2">Tài khoản test (Mock):</p>
+        <div className="space-y-1 text-blue-700">
+          <p>• admin@example.com / admin123</p>
+          <p>• user@example.com / user123</p>
+          <p>• demo@mebisoft.com / demo123</p>
+        </div>
+      </div>
+
+      {/* Quick login buttons */}
+      <div className="grid grid-cols-3 gap-2">
+        <button
+          type="button"
+          onClick={() => quickLogin('admin@example.com', 'admin123')}
+          className="px-3 py-2 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors"
+        >
+          Admin
+        </button>
+        <button
+          type="button"
+          onClick={() => quickLogin('user@example.com', 'user123')}
+          className="px-3 py-2 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
+        >
+          User
+        </button>
+        <button
+          type="button"
+          onClick={() => quickLogin('demo@mebisoft.com', 'demo123')}
+          className="px-3 py-2 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+        >
+          Demo
+        </button>
+      </div>
       
       <Input
         label="Email"

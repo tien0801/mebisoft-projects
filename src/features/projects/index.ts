@@ -6,7 +6,13 @@
  */
 
 // Components
-export { ProjectCard, ProjectList, ProjectToolbar, ProjectListView} from './components';
+export { ProjectCard } from './components/ProjectCard';
+export { ProjectList } from './components/ProjectList';
+export { ProjectToolbar } from './components/ProjectToolbar';
+export { ProjectListView } from './components/ProjectListView';
+export { ProjectDetail } from './components/ProjectDetail';
+export { CreateProjectModal } from './components/modal/CreateProjectModal';
+export type { ProjectFormData } from './components/modal/CreateProjectModal';
 
 // Store
 export { useProjectStore } from './store/projectStore';
