@@ -6,7 +6,7 @@
  */
 
 // Components
-export { ProjectCard, ProjectList, ProjectToolbar, ProjectListView} from './components';
+export { ProjectCard, ProjectList, ProjectToolbar, ProjectListView, ProjectReports, ProjectDetailsModal, UpdateStatusModal } from './components';
 
 // Store
 export { useProjectStore } from './store/projectStore';

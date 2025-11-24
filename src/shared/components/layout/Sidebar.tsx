@@ -28,6 +28,8 @@ const menuItems: MenuItem[] = [
     icon: '📊',
     children: [
       { name: 'Projects', href: '/dashboard' },
+      { name: 'Task', href: '/Task' },
+      { name: 'Project Reports', href: '/reports' },
       { name: 'Overview', href: '/dashboard/overview' },
     ],
   },
