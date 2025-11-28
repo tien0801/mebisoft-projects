@@ -6,8 +6,14 @@
  */
 
 // Components
-export * from './components';
-
+export { ProjectCard } from './components/ProjectCard';
+export { ProjectList } from './components/ProjectList';
+export { ProjectToolbar } from './components/ProjectToolbar';
+export { ProjectListView } from './components/ProjectListView';
+export { ProjectDetail } from './components/ProjectDetail';
+export { ProjectReports } from './components/ProjectReports';
+export { UpdateStatusModal } from './components/modal/UpdateStatusModal';
+export type { ProjectDetailsModal } from './components/modal/ProjectDetailsModal';
 
 // Store
 export * from './store/projectStore';

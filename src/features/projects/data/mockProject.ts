@@ -7,12 +7,6 @@
 
 
 import { Project, ProjectStatus } from '../types/project.types';
-import { MOCK_CLIENTS } from './mockMember';
-
-export const getClientNameById = (id: string) => {
-  const client = MOCK_CLIENTS.find(c => c.id === id);
-  return client ? client.name : 'Unknown Client';
-};
 
 // Mock data - 8 projects với 6 trạng thái khác nhau
 export const MOCK_PROJECTS: Project[] = [
@@ -28,12 +22,40 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '2', name: 'Jane Smith', avatar: '', role: 'Developer' },
             { id: '3', name: 'Mike Johnson', avatar: '', role: 'Designer' },
         ],
-        clientId: '1',
-        managerId: '1',
-        budget: '50000',
-        estimatedHours: '500',
-        tag: 'UI/UX',
-        imageUrl: 'https://ichef.bbci.co.uk/ace/standard/976/cpsprodpb/14235/production/_100058428_mediaitem100058424.jpg'
+        tasks: [
+            {
+                id: 'task-1',
+                name: 'The marketplace strategy',
+                startDate: '2025-09-20',
+                endDate: '2026-06-20',
+                status: ProjectStatus.IN_PROGRESS,
+                assignedTo: [{ id: '1', name: 'John Doe', role: 'PM' }]
+            },
+            {
+                id: 'task-2',
+                name: 'Application wireframe',
+                startDate: '2025-10-20',
+                endDate: '2026-03-20',
+                status: ProjectStatus.IN_PROGRESS,
+                assignedTo: [{ id: '2', name: 'Jane Smith', role: 'Developer' }]
+            },
+            {
+                id: 'task-3',
+                name: 'Lunch meeting',
+                startDate: '2025-11-20',
+                endDate: '2025-12-20',
+                status: ProjectStatus.PLANNING,
+                assignedTo: [{ id: '1', name: 'John Doe', role: 'PM' }]
+            },
+            {
+                id: 'task-4',
+                name: 'Finish the logo design',
+                startDate: '2025-08-20',
+                endDate: '2025-10-20',
+                status: ProjectStatus.COMPLETED,
+                assignedTo: [{ id: '3', name: 'Mike Johnson', role: 'Designer' }]
+            }
+        ]
     },
     {
         id: '2',
@@ -47,11 +69,32 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '5', name: 'Tom Brown', avatar: '', role: 'Developer' },
             { id: '6', name: 'Lisa Davis', avatar: '', role: 'QA' },
         ],
-        clientId: '2',
-        managerId: '4',
-        budget: '30000',
-        estimatedHours: '300',
-        tag: 'Marketing',
+        tasks: [
+            {
+                id: 'task-21',
+                name: 'Design email templates',
+                startDate: '2021-04-25',
+                endDate: '2021-05-20',
+                status: ProjectStatus.IN_PROGRESS,
+                assignedTo: [{ id: '4', name: 'Sarah Wilson', role: 'PM' }]
+            },
+            {
+                id: 'task-22',
+                name: 'Set up template system',
+                startDate: '2021-05-15',
+                endDate: '2021-06-10',
+                status: ProjectStatus.IN_PROGRESS,
+                assignedTo: [{ id: '5', name: 'Tom Brown', role: 'Developer' }]
+            },
+            {
+                id: 'task-23',
+                name: 'Quality assurance testing',
+                startDate: '2021-06-05',
+                endDate: '2021-07-20',
+                status: ProjectStatus.PREPARING,
+                assignedTo: [{ id: '6', name: 'Lisa Davis', role: 'QA' }]
+            }
+        ]
     },
     {
         id: '3',
@@ -65,11 +108,32 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '8', name: 'Emma White', avatar: '', role: 'Developer' },
             { id: '9', name: 'Chris Martin', avatar: '', role: 'QA' },
         ],
-        clientId: '3',
-        managerId: '7',
-        budget: '75000',
-        estimatedHours: '800',
-        tag: 'Backend',
+        tasks: [
+            {
+                id: 'task-31',
+                name: 'API endpoint development',
+                startDate: '2021-07-20',
+                endDate: '2021-08-15',
+                status: ProjectStatus.IN_PROGRESS,
+                assignedTo: [{ id: '7', name: 'David Lee', role: 'Developer' }]
+            },
+            {
+                id: 'task-32',
+                name: 'Payment gateway integration',
+                startDate: '2021-08-10',
+                endDate: '2021-09-05',
+                status: ProjectStatus.IN_PROGRESS,
+                assignedTo: [{ id: '8', name: 'Emma White', role: 'Developer' }]
+            },
+            {
+                id: 'task-33',
+                name: 'Security testing',
+                startDate: '2021-08-20',
+                endDate: '2021-09-15',
+                status: ProjectStatus.IN_PROGRESS,
+                assignedTo: [{ id: '9', name: 'Chris Martin', role: 'QA' }]
+            }
+        ]
     },
     {
         id: '4',
@@ -83,11 +147,32 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '11', name: 'James Anderson', avatar: '', role: 'Developer' },
             { id: '12', name: 'Sophia Thomas', avatar: '', role: 'Designer' },
         ],
-        clientId: '4',
-        managerId: '10',
-        budget: '40000',
-        estimatedHours: '400',
-        tag: 'Web',
+        tasks: [
+            {
+                id: 'task-41',
+                name: 'Content preparation',
+                startDate: '2021-07-20',
+                endDate: '2021-08-10',
+                status: ProjectStatus.ON_HOLD,
+                assignedTo: [{ id: '10', name: 'Anna Taylor', role: 'PM' }]
+            },
+            {
+                id: 'task-42',
+                name: 'Backend deployment',
+                startDate: '2021-08-05',
+                endDate: '2021-08-25',
+                status: ProjectStatus.ON_HOLD,
+                assignedTo: [{ id: '11', name: 'James Anderson', role: 'Developer' }]
+            },
+            {
+                id: 'task-43',
+                name: 'Frontend optimization',
+                startDate: '2021-08-15',
+                endDate: '2021-09-05',
+                status: ProjectStatus.ON_HOLD,
+                assignedTo: [{ id: '12', name: 'Sophia Thomas', role: 'Designer' }]
+            }
+        ]
     },
     {
         id: '5',
@@ -101,11 +186,32 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '14', name: 'Mia Harris', avatar: '', role: 'Developer' },
             { id: '15', name: 'Liam Clark', avatar: '', role: 'Designer' },
         ],
-        clientId: '5',
-        managerId: '13',
-        budget: '60000',
-        estimatedHours: '600',
-        tag: 'SaaS',
+        tasks: [
+            {
+                id: 'task-51',
+                name: 'UI component library',
+                startDate: '2021-07-20',
+                endDate: '2021-08-15',
+                status: ProjectStatus.COMPLETED,
+                assignedTo: [{ id: '13', name: 'Oliver Jackson', role: 'PM' }]
+            },
+            {
+                id: 'task-52',
+                name: 'Drag and drop functionality',
+                startDate: '2021-08-10',
+                endDate: '2021-08-30',
+                status: ProjectStatus.COMPLETED,
+                assignedTo: [{ id: '14', name: 'Mia Harris', role: 'Developer' }]
+            },
+            {
+                id: 'task-53',
+                name: 'Theme customization',
+                startDate: '2021-08-20',
+                endDate: '2021-09-10',
+                status: ProjectStatus.COMPLETED,
+                assignedTo: [{ id: '15', name: 'Liam Clark', role: 'Designer' }]
+            }
+        ]
     },
     {
         id: '6',
@@ -119,11 +225,32 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '17', name: 'Noah Walker', avatar: '', role: 'Developer' },
             { id: '18', name: 'Isabella Hall', avatar: '', role: 'QA' },
         ],
-        clientId: '6',
-        managerId: '16',
-        budget: '25000',
-        estimatedHours: '250',
-        tag: 'Library',
+        tasks: [
+            {
+                id: 'task-61',
+                name: 'Button component design',
+                startDate: '2021-07-20',
+                endDate: '2021-08-05',
+                status: ProjectStatus.CANCELLED,
+                assignedTo: [{ id: '16', name: 'Ava Lewis', role: 'Developer' }]
+            },
+            {
+                id: 'task-62',
+                name: 'Form controls implementation',
+                startDate: '2021-08-01',
+                endDate: '2021-08-20',
+                status: ProjectStatus.CANCELLED,
+                assignedTo: [{ id: '17', name: 'Noah Walker', role: 'Developer' }]
+            },
+            {
+                id: 'task-63',
+                name: 'Documentation writing',
+                startDate: '2021-08-10',
+                endDate: '2021-08-30',
+                status: ProjectStatus.CANCELLED,
+                assignedTo: [{ id: '18', name: 'Isabella Hall', role: 'QA' }]
+            }
+        ]
     },
     {
         id: '7',
@@ -137,11 +264,32 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '20', name: 'Charlotte King', avatar: '', role: 'Developer' },
             { id: '21', name: 'Mason Wright', avatar: '', role: 'Designer' },
         ],
-        clientId: '7',
-        managerId: '19',
-        budget: '45000',
-        estimatedHours: '450',
-        tag: 'Framework',
+        tasks: [
+            {
+                id: 'task-71',
+                name: 'Grid system setup',
+                startDate: '2025-07-20',
+                endDate: '2025-08-20',
+                status: ProjectStatus.COMPLETED,
+                assignedTo: [{ id: '19', name: 'Ethan Young', role: 'PM' }]
+            },
+            {
+                id: 'task-72',
+                name: 'CSS utilities development',
+                startDate: '2025-08-15',
+                endDate: '2025-10-15',
+                status: ProjectStatus.COMPLETED,
+                assignedTo: [{ id: '20', name: 'Charlotte King', role: 'Developer' }]
+            },
+            {
+                id: 'task-73',
+                name: 'Icon set creation',
+                startDate: '2025-09-01',
+                endDate: '2025-11-01',
+                status: ProjectStatus.COMPLETED,
+                assignedTo: [{ id: '21', name: 'Mason Wright', role: 'Designer' }]
+            }
+        ]
     },
     {
         id: '8',
@@ -154,10 +302,5 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '22', name: 'Amelia Scott', avatar: '', role: 'Developer' },
             { id: '23', name: 'Lucas Green', avatar: '', role: 'QA' },
         ],
-        clientId: '8',
-        managerId: '22',
-        budget: '55000',
-        estimatedHours: '550',
-        tag: 'Mobile',
     },
 ];

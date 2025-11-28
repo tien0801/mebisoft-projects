@@ -12,15 +12,14 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/features/auth';
 import '@/css/sidebar.css';
 
 type MenuItem = {
   name: string;
-  href: string;
+  href?: string;
   iconPath: string;
+  children?: { name: string; href: string }[];
   group?: string;
-  parent?: string;
 };
 
 // Menu items - CHỈ Dashboard và Projects
@@ -28,11 +27,12 @@ export const menuItems: MenuItem[] = [
   { name: 'Dashboard', href: '/dashboard', iconPath: '/images/sidebar/hrm_system.svg' },
   { name: 'Project System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
   { name: 'Projects', href: '/projects', iconPath: '/images/sidebar/Project_system.svg', group: 'Project System' },
+  { name: 'Tasks', href: '/taskboard', iconPath: '/images/sidebar/Project_system.svg', group: 'Project System' },
+  { name: 'Reports', href: '/reportboard', iconPath: '/images/sidebar/Project_system.svg', group: 'Project System' },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user } = useAuth();
 
   const grouped = menuItems.reduce<Record<string, MenuItem[]>>((acc, item) => {
     const key = item.group || '__root__';
@@ -44,21 +44,21 @@ export function Sidebar() {
   const rootItems = grouped['__root__'] || [];
   const dashboardItem = rootItems.find((i) => i.name === 'Dashboard');
   const otherRootItems = rootItems.filter((i) => i.name !== 'Dashboard');
-  
   const displayedItems: Array<MenuItem & { isSyntheticGroup?: boolean }> = [];
   if (dashboardItem) displayedItems.push(dashboardItem);
   displayedItems.push(...otherRootItems);
 
-  // Mặc định Dashboard luôn mở khi có child active
-  const dashChildren = grouped['Dashboard'] || [];
-  const dashActive = dashChildren.some((c) => c.href !== '#' && pathname.startsWith(c.href));
-  
   const [openMap, setOpenMap] = useState<Record<string, boolean>>(() => {
     const map: Record<string, boolean> = {};
-    if (dashActive) map['Dashboard'] = true;
+    Object.entries(grouped).forEach(([key, items]) => {
+      if (key === '__root__') return;
+      const hasActive = items.some((c) => c.href && c.href !== '#' && pathname.startsWith(c.href));
+      if (hasActive) {
+        map[key] = true;
+      }
+    });
     return map;
   });
-  
   // Toggle: Click để đóng/mở
   const toggleOpen = (key: string) => setOpenMap((s) => ({ ...s, [key]: !s[key] }));
 
@@ -83,11 +83,11 @@ export function Sidebar() {
               const isActive = pathname === item.href;
               const isDropdown = item.name === 'Project System';
               const children = grouped[item.name] || [];
-              const hasActiveChild = children.some((c) => c.href !== '#' && pathname.startsWith(c.href));
+              const hasActiveChild = children.some((c) => c.href && c.href !== '#' && pathname.startsWith(c.href));
               const opened = !!openMap[item.name] || hasActiveChild;
 
               if (isDropdown) {
-                const rootChildren = children.filter((c) => !c.parent);
+                const rootChildren = children;
 
                 return (
                   <li key={key}>
@@ -120,6 +120,8 @@ export function Sidebar() {
                       {opened && rootChildren.length > 0 && (
                         <ul className="menuListNested">
                           {rootChildren.map((c) => {
+                            if (!c.href) return null;
+
                             const childActive = pathname === c.href;
                             return (
                               <li key={c.href}>
@@ -140,8 +142,11 @@ export function Sidebar() {
               }
 
               return (
-                <li key={key}>
-                  <Link href={item.href} className={cn('menuItem', isActive && 'active')}>
+                <li key={item.name}>
+                  <Link
+                    href={item.href ?? '#'}
+                    className={cn('menuItem', isActive && 'active')}
+                  >
                     <span className="icon">
                       <Image src={item.iconPath} alt={item.name} width={36} height={36} />
                     </span>

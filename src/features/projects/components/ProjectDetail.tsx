@@ -1,484 +1,383 @@
 /**
  * @file ProjectDetail.tsx
- * @description Component hiển thị chi tiết project theo design mẫu
+ * @description Comprehensive Project Detail Dashboard Component
  * @author Mebisoft Team
- * @created 2025-11-24
+ * @created 2025-11-26
  */
 
 'use client';
 
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  CalendarOutlined,
-  DollarOutlined,
-  FileTextOutlined,
-  ClockCircleOutlined,
-  PlusOutlined,
-  UserOutlined,
-  FileOutlined,
-  HistoryOutlined,
-} from '@ant-design/icons';
+import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { ChevronLeft, Plus, Share2, Edit3, Calendar, DollarSign, Clock } from 'lucide-react';
 import { useProjectStore } from '../store/projectStore';
-import { PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS } from '../types';
-import { MOCK_USERS } from '../data';
-import { CreateProjectMemberModal } from './modal';
-import {
-  getActivitiesByProjectId,
-  getMilestonesByProjectId,
-  getAttachmentsByProjectId,
-  formatDate as formatActivityDate,
-  getFileIconColor,
-  getMilestoneStatusColor,
-  getMilestoneStatusLabel,
-} from '../data';
+import { calculateProjectCompletion, stringToColor } from '../../tasks/utils/task.utils';
+import { PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS } from '../types/project.types';
 
 interface ProjectDetailProps {
   projectId: string;
 }
 
-/**
- * ProjectDetail Component
- * Hiển thị chi tiết đầy đủ của 1 project theo design mẫu
- */
-export function ProjectDetail({ projectId }: ProjectDetailProps) {
-  const router = useRouter();
-  const { projects, selectedProject, setSelectedProject, getClientById } = useProjectStore();
-  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+const getInitials = (name: string) => {
+  return name
+    .split(' ')
+    .map(part => part[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
+};
 
-  // Load mock data
-  const activities = getActivitiesByProjectId(projectId);
-  const milestones = getMilestonesByProjectId(projectId);
-  const attachments = getAttachmentsByProjectId(projectId);
+export const ProjectDetail = ({ projectId }: ProjectDetailProps) => {
+  const { projects } = useProjectStore();
+  const [activeTab, setActiveTab] = useState<'gantt' | 'tracker' | 'expense' | 'timesheet' | 'bug' | 'task'>('gantt');
 
-  // Load project khi component mount
-  useEffect(() => {
-    const project = projects.find((p) => p.id === projectId);
-    if (project) {
-      setSelectedProject(project);
-    }
-  }, [projectId, projects, setSelectedProject]);
+  const project = useMemo(() => {
+    return projects.find(p => p.id === projectId);
+  }, [projects, projectId]);
 
-  // Handle add member
-  const handleAddMember = (userId: string) => {
-    const user = MOCK_USERS.find(u => u.id === userId);
-    if (user && selectedProject) {
-      const exists = selectedProject.members.some(m => m.id === userId);
-      if (!exists) {
-        const newMember = {
-          id: user.id,
-          name: user.name,
-          avatar: user.avatar,
-          role: user.role,
-        };
-        const updatedProject = {
-          ...selectedProject,
-          members: [...selectedProject.members, newMember],
-        };
-        setSelectedProject(updatedProject);
-      }
-    }
-  };
-
-  // Nếu chưa load xong
-  if (!selectedProject) {
+  if (!project) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-gray-500">Loading...</div>
+      <div className="p-6">
+        <h1 className="text-2xl font-bold text-gray-900">Project Not Found</h1>
       </div>
     );
   }
 
-  // Format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN');
-  };
+  const completion = calculateProjectCompletion(project);
 
   return (
-    <div className="min-h-screen  p-4 md:p-6">
-      {/* Header: Breadcrumb and Action Buttons */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        {/* Left: Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <button onClick={() => router.push('/dashboard')} className="hover:text-blue-600">
-            Dashboard
-          </button>
-          <span>/</span>
-          <button onClick={() => router.push('/projects')} className="hover:text-blue-600">
-            Project
-          </button>
-          <span>/</span>
-          <span className="text-gray-900 font-medium truncate max-w-[200px]">
-            {selectedProject.name}
-          </span>
-        </div>
-
-        {/* Right: Action Buttons */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => router.push(`/projects/${projectId}/budget`)}
-            className="px-3 py-1.5 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors flex items-center gap-1.5 text-xs"
-          >
-            <DollarOutlined />
-            <span>Budgeting</span>
-          </button>
-          <button className="px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-xs">
-            Tracker
-          </button>
-          <button className="px-3 py-1.5 bg-teal-500 text-white rounded-md hover:bg-teal-600 transition-colors text-xs">
-            Expense
-          </button>
-          <button className="px-3 py-1.5 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors text-xs">
-            Timesheet
-          </button>
-          <button className="px-3 py-1.5 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors text-xs">
-            Bug Report
-          </button>
-          <button className="px-3 py-1.5 bg-pink-500 text-white rounded-md hover:bg-pink-600 transition-colors text-xs">
-            Task
-          </button>
-        </div>
-      </div>
-
-
-      {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
-        {/* Total Task */}
-        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-pink-100 rounded-lg flex items-center justify-center shrink-0">
-              <FileTextOutlined className="text-xl md:text-2xl text-pink-500" />
-              
-              <p className="text-xs md:text-sm text-gray-600 mb-1">Total Task</p>
-            </div>
-            <div className="flex-1">
-              <p className="text-2xl md:text-3xl font-bold text-gray-900">0</p>
-              <p className="text-xs md:text-sm text-gray-500 mt-1">Done Task <span className="font-semibold">0</span></p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <Link href="/dashboard" className="flex items-center gap-2 text-green-600 hover:text-green-700">
+              <ChevronLeft className="w-4 h-4" />
+              Back to Dashboard
+            </Link>
+            <div className="flex items-center gap-2">
+              <button className="p-2 text-gray-600 hover:text-gray-900 bg-gray-100 rounded-lg">
+                <Share2 className="w-5 h-5" />
+              </button>
+              <button className="p-2 text-gray-600 hover:text-gray-900 bg-gray-100 rounded-lg">
+                <Edit3 className="w-5 h-5" />
+              </button>
             </div>
           </div>
-        </div>
 
-        {/* Total Budget */}
-        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <p className="text-xs md:text-sm text-gray-600 mb-1">Total Budget</p>
-              <p className="text-2xl md:text-3xl font-bold text-gray-900">
-                $ {selectedProject.budget ? Number(selectedProject.budget).toLocaleString() : '0'}
-              </p>
-            </div>
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
-              <DollarOutlined className="text-xl md:text-2xl text-green-500" />
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{project.name}</h1>
+              <nav className="flex items-center space-x-2 text-sm text-gray-600">
+                <Link href="/dashboard" className="text-green-600 hover:underline">Dashboard</Link>
+                <span className="text-gray-400">›</span>
+                <Link href="/projects" className="text-green-600 hover:underline">Project</Link>
+                <span className="text-gray-400">›</span>
+                <span className="text-gray-900">{project.name}</span>
+              </nav>
             </div>
           </div>
-        </div>
 
-        {/* Total Expense */}
-        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <p className="text-xs md:text-sm text-gray-600 mb-1">Total Expense</p>
-              <p className="text-2xl md:text-3xl font-bold text-gray-900">$ 0,00</p>
-            </div>
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-100 rounded-lg flex items-center justify-center shrink-0">
-              <FileTextOutlined className="text-xl md:text-2xl text-orange-500" />
-            </div>
+          {/* Tabs */}
+          <div className="flex items-center gap-2 mt-6 flex-wrap">
+            {[
+              { key: 'gantt', label: 'Gantt Chart', color: 'bg-green-500' },
+              { key: 'tracker', label: 'Tracker', color: 'bg-blue-500' },
+              { key: 'expense', label: 'Expense', color: 'bg-teal-500' },
+              { key: 'timesheet', label: 'Timesheet', color: 'bg-blue-600' },
+              { key: 'bug', label: 'Bug Report', color: 'bg-green-600' },
+              { key: 'task', label: 'Task', color: 'bg-gray-500' }
+            ].map(tab => (
+              <Link
+                key={tab.key}
+                href={`/projects/${projectId}/${tab.key}`}
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition ${activeTab === tab.key
+                  ? `${tab.color} text-white`
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+              >
+                {tab.label}
+              </Link>
+            ))}
+            <button className="px-4 py-2 rounded-lg font-medium text-sm bg-blue-400 text-white hover:bg-blue-500 transition ml-auto">
+              <Edit3 className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Main Content Grid - 2 columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
-        {/* Left Column - Dashboard */}
-        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-          {/* Image and Progress Section */}
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            {/* Image on the left */}
-            <div className="relative w-full md:w-1/5 h-20 rounded-lg shadow-md overflow-hidden shrink-0">
-              {selectedProject.imageUrl && (
-                <Image
-                  src={selectedProject.imageUrl}
-                  alt={`Hình ảnh của dự án ${selectedProject.name}`}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  className="rounded-lg"
-                />
-              )}
-            </div>
-            {/* Project Name and Progress on the right */}
-            <div className="flex flex-col justify-center flex-1">
-              <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-4">{selectedProject.name}</h2>
-              <div className="flex justify-between text-xs md:text-sm mb-1">
-                <span className="text-gray-600">Completed</span>
-                <span className="text-gray-900 font-medium">0%</span>
+      {/* Main Content */}
+      <div className="p-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          {/* Total Task Card */}
+          <div className="bg-white rounded-lg shadow p-6 relative overflow-hidden">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Total Task</p>
+                <p className="text-3xl font-bold text-gray-900">7</p>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{ width: '0%' }}></div>
+              <div className="text-right">
+                <p className="text-sm text-gray-600 mb-1">Done Task</p>
+                <p className="text-2xl font-bold text-gray-900">2</p>
               </div>
             </div>
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-pink-200 rounded-full -mr-12 -mb-12 opacity-50"></div>
           </div>
 
-          <div className="mb-4 md:mb-6">
-            <p className="text-xs md:text-sm text-gray-500">{selectedProject.description}</p>
+          {/* Total Budget Card */}
+          <div className="bg-white rounded-lg shadow p-6 relative overflow-hidden">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Total</p>
+                  <p className="text-sm text-gray-600">Budget</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-gray-900">$ 2.000,00</p>
+              </div>
+            </div>
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-green-200 rounded-full -mr-12 -mb-12 opacity-30"></div>
           </div>
-          {/* Project Info */}
-          <div className="bg-green-500 rounded-lg p-3 md:p-4 text-white mb-4 md:mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs md:text-sm">Start Date</span>
-              <span className="text-xs md:text-sm">End Date</span>
+
+          {/* Total Expense Card */}
+          <div className="bg-white rounded-lg shadow p-6 relative overflow-hidden">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-3 bg-orange-100 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-orange-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Total</p>
+                  <p className="text-sm text-gray-600">Expense</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-gray-900">$ 100,00</p>
+              </div>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm md:text-base font-semibold">{formatDate(selectedProject.startDate)}</span>
-              <span className="text-sm md:text-base font-semibold">{formatDate(selectedProject.endDate)}</span>
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-orange-200 rounded-full -mr-12 -mb-12 opacity-30"></div>
+          </div>
+        </div>
+
+        {/* Project Info and Details */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Project Info Card */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                {getInitials(project.name)}
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">{project.name}</h3>
+                <p className="text-sm text-gray-600">
+                  Completed: <span className="font-semibold text-gray-900">{completion}%</span>
+                </p>
+                <div className="w-32 h-2 bg-gray-200 rounded-full mt-2">
+                  <div
+                    className={`h-2 rounded-full ${completion < 50 ? 'bg-red-500' : completion < 80 ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}
+                    style={{ width: `${completion}%` }}
+                  ></div>
+                </div>
+              </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-green-400">
-              <div className="flex justify-between items-center">
-                <span className="text-xs md:text-sm">Client</span>
-                <span className="text-sm md:text-base font-semibold truncate max-w-[150px]">
-                  {selectedProject.clientId ? getClientById(selectedProject.clientId)?.name || 'N/A' : 'N/A'}
+
+            <p className="text-sm text-gray-600 mb-6 line-clamp-3">{project.description}</p>
+
+            <div className="bg-green-500 text-white rounded-lg p-4 space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">Start Date</span>
+                <span className="font-bold">{new Date(project.startDate).toLocaleDateString('en-GB', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit'
+                })}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm">End Date</span>
+                <span className="font-bold">{new Date(project.endDate).toLocaleDateString('en-GB', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit'
+                })}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-green-400">
+                <span className="text-sm">Client</span>
+                <span className="font-bold">
+                  {project.members?.[0]?.name || 'Not assigned'}
                 </span>
               </div>
             </div>
           </div>
 
-        </div>
-
-        {/* Mid Column - 2 Stats Cards với chiều cao bằng nhau */}
-        <div className="space-y-4 md:space-y-6">
-          {/* Last 7 days task done */}
-          <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 h-full">
-            <div className="flex items-center gap-2 md:gap-3 mb-4">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
-                <CalendarOutlined className="text-white text-sm md:text-base" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-600">Last 7 days task done</p>
-                <p className="text-lg md:text-xl font-bold text-gray-900">0</p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between text-xs md:text-sm">
-                <span className="text-gray-600">Day Left</span>
-                <span className="text-gray-900 font-medium">130/730</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-dark h-2 rounded-full" style={{ width: '100%' }}></div>
-              </div>
-              <div className="flex justify-between text-xs md:text-sm">
-                <span className="text-gray-600">Open Task</span>
-                <span className="text-gray-900 font-medium">2/2</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-dark h-2 rounded-full" style={{ width: '100%' }}></div>
-              </div>
-              <div className="flex justify-between text-xs md:text-sm">
-                <span className="text-gray-600">Completed Milestone</span>
-                <span className="text-gray-900 font-medium">0/2</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-dark h-2 rounded-full" style={{ width: '100%' }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column - 2 Stats Cards với chiều cao bằng nhau */}
-        <div className="space-y-4 md:space-y-6">
-          {/* Last 7 days hours spent */}
-          <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 h-full">
-            <div className="flex items-center gap-2 md:gap-3 mb-4">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
-                <ClockCircleOutlined className="text-white text-sm md:text-base" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-600">Last 7 days hours spent</p>
-                <p className="text-lg md:text-xl font-bold text-gray-900">0</p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between text-xs md:text-sm">
-                <span className="text-gray-600">Total project time spent</span>
-                <span className="text-gray-900 font-medium">0/0</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-dark h-2 rounded-full" style={{ width: '100%' }}></div>
-              </div>
-              <div className="flex justify-between text-xs md:text-sm">
-                <span className="text-gray-600">Allocated hours on task</span>
-                <span className="text-gray-900 font-medium">0/0</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{ width: '100%' }}></div>
-              </div>
-              <div className="flex justify-between text-xs md:text-sm mb-2">
-                <span className="text-gray-600">User Assigned</span>
-                <span className="text-gray-900 font-medium">27/27</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{ width: '100%' }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Grid - Members, Activity, Milestones, Attachments */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {/* Members Card */}
-        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-4 shrink-0">
-            <h3 className="text-base md:text-lg font-semibold text-gray-900">
-              Members ({selectedProject.members.length})
-            </h3>
-            <button
-              onClick={() => setIsAddMemberModalOpen(true)}
-              className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white hover:bg-green-600 shrink-0"
-            >
-              <PlusOutlined />
-            </button>
-          </div>
-          <div className="space-y-3 max-h-64 overflow-y-auto grow">
-            {selectedProject.members.map((member) => (
-              <div key={member.id} className="flex items-center justify-between">
-                <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs md:text-sm font-medium shrink-0">
-                    {member.name.split(' ').map(n => n[0]).join('')}
+          {/* Statistics Grid */}
+          <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+            {[
+              { icon: Calendar, label: 'Last 7 days task done', value: '0', color: 'bg-green-100' },
+              { icon: Clock, label: 'Last 7 days hours spent', value: '8', color: 'bg-green-100' },
+              { icon: Calendar, label: 'Day Left', value: '1,677/86', color: 'bg-blue-100', subtext: true },
+              { icon: Calendar, label: 'Open Task', value: '5/7', color: 'bg-blue-100', subtext: true },
+              { icon: Calendar, label: 'Completed Milestone', value: '1/4', color: 'bg-blue-100', subtext: true },
+              { icon: Clock, label: 'Total project time spent', value: '81/81', color: 'bg-green-100', subtext: true }
+            ].map((stat, idx) => (
+              <div key={idx} className="bg-white rounded-lg shadow p-4">
+                <div className="flex items-start gap-3">
+                  <div className={`${stat.color} p-3 rounded-lg`}>
+                    <stat.icon className="w-5 h-5 text-gray-700" />
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs md:text-sm font-medium text-gray-900 truncate">{member.name}</p>
-                    <p className="text-xs text-gray-500">{member.role || 'Member'}</p>
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">{stat.label}</p>
+                    <p className="text-lg font-bold text-gray-900">{stat.value}</p>
                   </div>
                 </div>
-                <button className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center text-white hover:bg-pink-600 shrink-0 ml-2">
-                  <UserOutlined />
-                </button>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Activity Log Card */}
-        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-4 shrink-0">
-            <div className="flex items-center gap-2">
-              <HistoryOutlined className="text-lg text-gray-600" />
-              <h3 className="text-base md:text-lg font-semibold text-gray-900">
-                Activity Log ({activities.length})
-              </h3>
+        {/* Members and Milestones Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Members */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-gray-900">Members</h3>
+              <button className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                <Plus className="w-5 h-5" />
+              </button>
             </div>
-          </div>
-          <div className="space-y-3 max-h-64 overflow-y-auto grow">
-              {activities.map((activity, index) => {
-                const bgColors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-teal-500'];
-                const bgColor = bgColors[index % bgColors.length];
-                const initials = activity.userName
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('');
 
-                return (
-                  <div key={activity.id} className="flex gap-3">
-                    <div className={`w-8 h-8 ${bgColor} rounded-full flex items-center justify-center text-white text-xs font-medium shrink-0`}>
-                      {initials}
+            <div className="space-y-3">
+              {project.members && project.members.length > 0 ? (
+                project.members.map((member, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold text-white"
+                        style={{ backgroundColor: stringToColor(member.name) }}
+                      >
+                        {getInitials(member.name)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{member.name}</p>
+                        <p className="text-xs text-gray-600">{member.role || 'Team Member'}</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-xs md:text-sm text-gray-900">
-                        <span className="font-semibold">{activity.userName}</span> {activity.action}
-                      </p>
-                      <p className="text-xs text-gray-500">{activity.timestamp}</p>
-                    </div>
+                    <button className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                      ✕
+                    </button>
                   </div>
-                );
-              })}
+                ))
+              ) : (
+                <p className="text-sm text-gray-600">No members assigned</p>
+              )}
             </div>
-        </div>
-
-        {/* Milestones Card */}
-        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-4 shrink-0">
-            <h3 className="text-base md:text-lg font-semibold text-gray-900">
-              Milestones ({milestones.length})
-            </h3>
-            <button className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white hover:bg-green-600 shrink-0">
-              <PlusOutlined />
-            </button>
           </div>
-          <div className="space-y-3 max-h-64 overflow-y-auto grow">
-            {milestones.length > 0 ? (
-              milestones.map((milestone) => (
-                <div key={milestone.id} className="border border-gray-200 rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-semibold text-gray-900">{milestone.title}</h4>
-                    <span className={`px-2 py-1 text-xs rounded-full ${getMilestoneStatusColor(milestone.status)}`}>
-                      {getMilestoneStatusLabel(milestone.status)}
+
+          {/* Milestones */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-gray-900">Milestones ({project.members?.length || 0})</h3>
+              <button className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {[
+                { name: 'Hiring Individual Positions', tasks: 16, status: 'Complete', color: 'bg-green-100', statusColor: 'bg-green-500' },
+                { name: 'Communication Updates', tasks: 32, status: 'In Progress', color: 'bg-blue-100', statusColor: 'bg-blue-500' },
+                { name: 'Design Approval', tasks: 0, status: 'On Hold', color: 'bg-orange-100', statusColor: 'bg-orange-500' },
+                { name: 'Communication Updates', tasks: 0, status: 'Canceled', color: 'bg-red-100', statusColor: 'bg-red-500' }
+              ].map((milestone, idx) => (
+                <div key={idx} className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">{milestone.name}</p>
+                      <p className="text-xs text-gray-600">{milestone.tasks} Tasks</p>
+                    </div>
+                    <span className={`${milestone.statusColor} text-white text-xs font-semibold px-3 py-1 rounded-full`}>
+                      {milestone.status}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-600 mb-2">{milestone.description}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <CalendarOutlined />
-                    <span>Due: {formatActivityDate(milestone.dueDate)}</span>
+                  <div className="flex gap-2">
+                    <button className="p-1.5 bg-orange-100 text-orange-600 rounded hover:bg-orange-200">
+                      👁
+                    </button>
+                    <button className="p-1.5 bg-blue-100 text-blue-600 rounded hover:bg-blue-200">
+                      ✎
+                    </button>
+                    <button className="p-1.5 bg-red-100 text-red-600 rounded hover:bg-red-200">
+                      🗑
+                    </button>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-6 md:py-8">
-                <p className="text-sm md:text-base text-gray-500">No Milestone Found.</p>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Attachments Card */}
-        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-4 shrink-0">
-            <div className="flex items-center gap-2">
-              <FileOutlined className="text-lg text-gray-600" />
-              <h3 className="text-base md:text-lg font-semibold text-gray-900">
-                Attachments ({attachments.length})
-              </h3>
-            </div>
-            <button className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white hover:bg-green-600 shrink-0">
-              <PlusOutlined />
-            </button>
-          </div>
-          <div className="space-y-2 max-h-64 overflow-y-auto grow">
-            {attachments.length > 0 ? (
-              attachments.map((attachment) => (
-                <div
-                  key={attachment.id}
-                  className="flex items-center justify-between p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <FileOutlined className={`${getFileIconColor(attachment.fileType)} shrink-0`} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs md:text-sm font-medium text-gray-900 truncate">
-                        {attachment.fileName}
-                      </p>
-                      <p className="text-xs text-gray-500">{attachment.fileSize}</p>
-                    </div>
+        {/* Activity Log and Attachments */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Activity Log */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Activity Log</h3>
+            <p className="text-sm text-gray-600 mb-4">Activity Log of this project</p>
+
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {[
+                { icon: '✚', action: 'Workdo Moved the Task', detail: 'The marketplace strategy', timestamp: '4 years ago' },
+                { icon: '⟹', action: 'Move Task', detail: 'Workdo Moved the Task The marketplace strategy from To Do to Done', timestamp: '4 years ago' },
+                { icon: '⟹', action: 'Move Task', detail: 'Workdo Moved the Task Website redesign from To Do to Done', timestamp: '4 years ago' },
+                { icon: '⚠', action: 'Create Bug', detail: 'Workdo Created new bug Project1 Bug4', timestamp: '4 years ago' },
+                { icon: '⚠', action: 'Create Bug', detail: 'Workdo Created new bug Project1 Bug3', timestamp: '4 years ago' },
+                { icon: '⚠', action: 'Create Bug', detail: 'Workdo Created new bug Project1 Bug2', timestamp: '4 years ago' }
+              ].map((log, idx) => (
+                <div key={idx} className="flex gap-3">
+                  <div className="p-2 bg-green-100 rounded-full text-green-600 font-bold text-sm w-8 h-8 flex items-center justify-center flex-shrink-0">
+                    {log.icon}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">{log.action}</p>
+                    <p className="text-sm text-gray-600">{log.detail}</p>
+                    <p className="text-xs text-gray-500 mt-1">{log.timestamp}</p>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-6 md:py-8">
-                <p className="text-sm md:text-base text-gray-500">No Attachments Found.</p>
-              </div>
-            )}
+              ))}
+            </div>
+          </div>
+
+          {/* Attachments */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Attachments</h3>
+            <p className="text-sm text-gray-600 mb-4">Attachment that uploaded in this project</p>
+
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {[
+                { name: '11594448449_download.jpeg', size: '0.01 MB' },
+                { name: '11594445989_abstract-best-deals-sale-promotion-banner_44695-313.jpg', size: '0.1 MB' },
+                { name: '11594445989_abstract-best-deals-sale-promotion-banner_44695-313.jpg', size: '0.1 MB' },
+                { name: '41594448977_download.jpeg', size: '0.01 MB' },
+                { name: '41594448981_large.jpg', size: '0.5 MB' }
+              ].map((file, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
+                    <p className="text-xs text-gray-600">{file.size}</p>
+                  </div>
+                  <button className="p-2 bg-green-500 text-white rounded hover:bg-green-600">
+                    ↓
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Add Member Modal */}
-      <CreateProjectMemberModal
-        isOpen={isAddMemberModalOpen}
-        onClose={() => setIsAddMemberModalOpen(false)}
-        onAddMember={handleAddMember}
-        currentMembers={selectedProject.members}
-      />
     </div>
   );
-}
+};

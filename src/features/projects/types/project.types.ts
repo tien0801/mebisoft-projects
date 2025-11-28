@@ -35,12 +35,22 @@ export const PROJECT_STATUS_COLORS: Record<ProjectStatus, string> = {
   [ProjectStatus.CANCELLED]: 'bg-red-100 text-red-700',           // Đỏ
 };
 
-// Interface cho thành viên dự án
+// Interface thành viên dự án
 export interface ProjectMember {
   id: string;
   name: string;
   avatar?: string;
   role?: string; // PM, Developer, QA, Designer
+}
+
+// Interface cho task trong project
+export interface ProjectTask {
+  id: string;
+  name: string;
+  startDate: string;  // ISO format
+  endDate: string;    // ISO format
+  status?: ProjectStatus;
+  assignedTo?: ProjectMember[];
 }
 
 // Interface chính cho Project
@@ -52,6 +62,7 @@ export interface Project {
   startDate: string;               // Ngày bắt đầu (ISO format)
   endDate: string;                 // Ngày kết thúc (ISO format)
   members: ProjectMember[];        // Danh sách thành viên
+  tasks?: ProjectTask[];           // Danh sách tasks trong project
   clientId?: string;               // ID khách hàng (liên kết hệ thống 2)
   managerId?: string;              // ID người phụ trách (liên kết hệ thống 3)
   imageUrl?: string;                  // URL hình ảnh project

@@ -11,6 +11,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { MoreVertical, Copy, Pencil, Trash2 } from 'lucide-react';
 import { Project, PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS } from '../types/project.types';
+import router from 'next/router';
 
 interface ProjectCardProps {
   project: Project;
@@ -89,7 +90,7 @@ export function ProjectCard({ project, onClick, onDuplicate, onEdit, onDelete }:
           <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold border-3 border-emerald-600">
             {project.name.charAt(0)}
           </div>
-          <h3 
+          <h3
             onClick={handleProjectNameClick}
             className="font-semibold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer"
           >
