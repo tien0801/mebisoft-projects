@@ -54,6 +54,10 @@ export interface Project {
   members: ProjectMember[];        // Danh sách thành viên
   clientId?: string;               // ID khách hàng (liên kết hệ thống 2)
   managerId?: string;              // ID người phụ trách (liên kết hệ thống 3)
+  imageUrl?: string;                  // URL hình ảnh project
+  budget?: string;                 // Ngân sách
+  estimatedHours?: string;         // Số giờ ước tính
+  tag?: string;                    // Tag/nhãn
 }
 
 // Interface cho filter projects

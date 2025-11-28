@@ -12,7 +12,7 @@ import { useProjectStore } from '../store/projectStore';
 import { ProjectCard } from './ProjectCard';
 import { ProjectListView } from './ProjectListView';
 import { ProjectToolbar } from './ProjectToolbar';
-import { CreateProjectModal, ProjectFormData } from './modal/CreateProjectModal';
+import { CreateProjectModal, ProjectFormData } from './modal/create/CreateProjectModal';
 import { useRouter } from 'next/navigation';
 import { Project, ProjectStatus, ProjectMember } from '../types/project.types';
 import { MOCK_USERS } from '../data/mockMember';

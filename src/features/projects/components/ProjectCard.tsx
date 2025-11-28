@@ -74,7 +74,7 @@ export function ProjectCard({ project, onClick, onDuplicate, onEdit, onDelete }:
   // Handle click vào tên project để navigate
   const handleProjectNameClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(`/dashboard/projects/${project.id}`);
+    router.push(`/projects/${project.id}`);
   };
 
   return (

@@ -7,6 +7,12 @@
 
 
 import { Project, ProjectStatus } from '../types/project.types';
+import { MOCK_CLIENTS } from './mockMember';
+
+export const getClientNameById = (id: string) => {
+  const client = MOCK_CLIENTS.find(c => c.id === id);
+  return client ? client.name : 'Unknown Client';
+};
 
 // Mock data - 8 projects với 6 trạng thái khác nhau
 export const MOCK_PROJECTS: Project[] = [
@@ -22,6 +28,12 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '2', name: 'Jane Smith', avatar: '', role: 'Developer' },
             { id: '3', name: 'Mike Johnson', avatar: '', role: 'Designer' },
         ],
+        clientId: '1',
+        managerId: '1',
+        budget: '50000',
+        estimatedHours: '500',
+        tag: 'UI/UX',
+        imageUrl: 'https://ichef.bbci.co.uk/ace/standard/976/cpsprodpb/14235/production/_100058428_mediaitem100058424.jpg'
     },
     {
         id: '2',
@@ -35,6 +47,11 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '5', name: 'Tom Brown', avatar: '', role: 'Developer' },
             { id: '6', name: 'Lisa Davis', avatar: '', role: 'QA' },
         ],
+        clientId: '2',
+        managerId: '4',
+        budget: '30000',
+        estimatedHours: '300',
+        tag: 'Marketing',
     },
     {
         id: '3',
@@ -48,6 +65,11 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '8', name: 'Emma White', avatar: '', role: 'Developer' },
             { id: '9', name: 'Chris Martin', avatar: '', role: 'QA' },
         ],
+        clientId: '3',
+        managerId: '7',
+        budget: '75000',
+        estimatedHours: '800',
+        tag: 'Backend',
     },
     {
         id: '4',
@@ -61,6 +83,11 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '11', name: 'James Anderson', avatar: '', role: 'Developer' },
             { id: '12', name: 'Sophia Thomas', avatar: '', role: 'Designer' },
         ],
+        clientId: '4',
+        managerId: '10',
+        budget: '40000',
+        estimatedHours: '400',
+        tag: 'Web',
     },
     {
         id: '5',
@@ -74,6 +101,11 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '14', name: 'Mia Harris', avatar: '', role: 'Developer' },
             { id: '15', name: 'Liam Clark', avatar: '', role: 'Designer' },
         ],
+        clientId: '5',
+        managerId: '13',
+        budget: '60000',
+        estimatedHours: '600',
+        tag: 'SaaS',
     },
     {
         id: '6',
@@ -87,6 +119,11 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '17', name: 'Noah Walker', avatar: '', role: 'Developer' },
             { id: '18', name: 'Isabella Hall', avatar: '', role: 'QA' },
         ],
+        clientId: '6',
+        managerId: '16',
+        budget: '25000',
+        estimatedHours: '250',
+        tag: 'Library',
     },
     {
         id: '7',
@@ -100,6 +137,11 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '20', name: 'Charlotte King', avatar: '', role: 'Developer' },
             { id: '21', name: 'Mason Wright', avatar: '', role: 'Designer' },
         ],
+        clientId: '7',
+        managerId: '19',
+        budget: '45000',
+        estimatedHours: '450',
+        tag: 'Framework',
     },
     {
         id: '8',
@@ -112,5 +154,10 @@ export const MOCK_PROJECTS: Project[] = [
             { id: '22', name: 'Amelia Scott', avatar: '', role: 'Developer' },
             { id: '23', name: 'Lucas Green', avatar: '', role: 'QA' },
         ],
+        clientId: '8',
+        managerId: '22',
+        budget: '55000',
+        estimatedHours: '550',
+        tag: 'Mobile',
     },
 ];

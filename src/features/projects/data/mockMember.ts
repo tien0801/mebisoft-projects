@@ -5,20 +5,7 @@
  * @created 2025-11-22
  */
 
-export interface Client {
-  id: string;
-  name: string;
-  company: string;
-  email: string;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar?: string;
-}
+import { Client, User } from "../types";
 
 // Mock Clients Data
 export const MOCK_CLIENTS: Client[] = [

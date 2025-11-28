@@ -8,11 +8,12 @@
 import { ProjectDetail } from '@/features/projects/components/ProjectDetail';
 
 interface ProjectDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
-  return <ProjectDetail projectId={params.id} />;
+export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
+  const { id } = await params;
+  return <ProjectDetail projectId={id} />;
 }

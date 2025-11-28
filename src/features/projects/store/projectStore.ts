@@ -8,19 +8,22 @@
 'use client';
 
 import { create } from 'zustand';
-import { Project, ProjectFilter } from '../types/project.types';
+import { Project, ProjectFilter, Client } from '../types';
 import { MOCK_PROJECTS } from '../data/mockProject';
+import { MOCK_CLIENTS  } from '../data/mockMember';
 
 
 
 // Interface định nghĩa shape của store
 interface ProjectState {
   // State
-  projects: Project[];              // Danh sách tất cả projects (mock data)
-  selectedProject: Project | null;  // Project đang được chọn
-  filter: ProjectFilter;            // Bộ lọc hiện tại
+  projects: Project[]; // Danh sách tất cả projects (mock data)
+  clients: Client[]; // Danh sách tất cả clients (mock data)
+  selectedProject: Project | null; // Project đang được chọn
+  filter: ProjectFilter; // Bộ lọc hiện tại
 
   // Actions
+  getClientById: (clientId: string) => Client | undefined; // Lấy client theo ID
   setSelectedProject: (project: Project | null) => void; // Chọn 1 project
   setFilter: (filter: ProjectFilter) => void;           // Cập nhật filter
   clearFilter: () => void;                              // Xóa filter
@@ -36,10 +39,14 @@ interface ProjectState {
 export const useProjectStore = create<ProjectState>((set, get) => ({
   // Initial state - Load mock data ngay từ đầu
   projects: MOCK_PROJECTS,
+  clients: MOCK_CLIENTS,
   selectedProject: null,
   filter: {},
 
   // Actions
+  getClientById: (clientId) => {
+    return get().clients.find((c) => c.id === clientId);
+  },
   setSelectedProject: (project) => set({ selectedProject: project }),
   
   setFilter: (filter) => set({ filter }),

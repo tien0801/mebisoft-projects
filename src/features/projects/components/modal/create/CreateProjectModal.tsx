@@ -9,8 +9,8 @@
 
 import { useState } from 'react';
 import { X, Sparkles } from 'lucide-react';
-import { ProjectStatus, PROJECT_STATUS_LABELS } from '../../types/project.types';
-import { MOCK_CLIENTS, MOCK_USERS } from '../../data/mockMember';
+import { ProjectStatus, PROJECT_STATUS_LABELS } from '../../../types/project.types';
+import { MOCK_CLIENTS, MOCK_USERS } from '../../../data/mockMember';
 
 interface CreateProjectModalProps {
   isOpen: boolean;
@@ -22,7 +22,7 @@ export interface ProjectFormData {
   name: string;
   startDate: string;
   endDate: string;
-  image?: File;
+  image?: File | string;
   client: string;
   user: string;
   budget: string;
