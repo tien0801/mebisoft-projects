@@ -8,8 +8,8 @@
 'use client';
 
 import { PlusOutlined } from '@ant-design/icons';
-import { MOCK_USERS } from '../../../data/mockMember';
-import { ProjectMember } from '../../../types/project.types';
+import { MOCK_USERS } from '../../data/mockMember';
+import { ProjectMember } from '../../types/project.types';
 
 interface CreateProjectMemberModalProps {
   isOpen: boolean;
