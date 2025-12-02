@@ -11,25 +11,27 @@ import { useMemo } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useProjectStore } from '../../projects/store/projectStore';
-import { calculateProjectCompletion, stringToColor, getPriorityColor } from '../utils/task.utils';
-import { PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS } from '../../projects/types/project.types';
-
+import { calculateProjectCompletion, stringToColor, getPriorityColor  } from '../utils/task.utils';
+import { PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS, ProjectStatus } from '../../projects/types/project.types';
+import { TaskPriority } from '../types/task.types';
 interface TaskDetailProps {
     taskId: string;
+
 }
 
 export const TaskDetail = ({ taskId }: TaskDetailProps) => {
     const { projects } = useProjectStore();
 
+    
     // Find the task in all projects
     const taskData = useMemo(() => {
         for (const project of projects) {
             // Create task from project
-            const task = {
+            const task: { stage: ProjectStatus; priority: TaskPriority; [key: string]: any } = {
                 id: project.id,
                 name: project.name,
                 stage: project.status,
-                priority: (() => {
+                priority: ((): TaskPriority => {
                     const daysUntilDeadline = Math.ceil(
                         (new Date(project.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
                     );

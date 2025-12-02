@@ -1,5 +1,5 @@
 
-import { Attachment } from '../types'
+import { Attachment} from '../types'
 
 // Mock Attachments Data
 export const MOCK_ATTACHMENTS: Attachment[] = [
