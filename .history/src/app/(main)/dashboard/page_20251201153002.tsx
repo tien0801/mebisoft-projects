@@ -14,6 +14,7 @@ import {
   ProjectStatus as ProjectStatusComponent,
   TasksOverview,
   TopDueProjects,
+  ProjectSystemMenu,
   TimesheetHours,
   TopDueTasks,
 } from '@/features/dashboard/components';

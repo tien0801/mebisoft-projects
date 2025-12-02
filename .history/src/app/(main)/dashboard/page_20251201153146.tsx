@@ -50,7 +50,7 @@ export default function DashboardPage() {
   return (
     <div className="p-4 md:p-6">
       {/* Welcome Section */}
-      <div className="mb-6">
+      <div className="mb-">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span>Dashboard</span>

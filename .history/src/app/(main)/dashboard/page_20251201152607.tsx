@@ -14,6 +14,7 @@ import {
   ProjectStatus as ProjectStatusComponent,
   TasksOverview,
   TopDueProjects,
+  ProjectSystemMenu,
   TimesheetHours,
   TopDueTasks,
 } from '@/features/dashboard/components';
@@ -81,9 +82,9 @@ export default function DashboardPage() {
       </div>
 
       {/* Bottom Grid - 3 columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <TopDueProjects projects={topDueProjects} />
-
+        <ProjectSystemMenu />
         <TimesheetHours />
       </div>
 

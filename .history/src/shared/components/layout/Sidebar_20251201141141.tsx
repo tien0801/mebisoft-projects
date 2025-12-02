@@ -24,13 +24,8 @@ type MenuItem = {
 
 // Menu items - Tất cả các hệ thống
 export const menuItems: MenuItem[] = [
-  // Dashboard với submenu
-  { name: 'Dashboard', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
-  { name: 'Accounting', href: '/dashboard/accounting', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
-  { name: 'HRM', href: '/dashboard/hrm', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
-  { name: 'CRM', href: '/dashboard/crm', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
-  { name: 'Project', href: '/dashboard', iconPath: '/images/sidebar/Project_system.svg', group: 'Dashboard' },
-  { name: 'POS', href: '/dashboard/pos', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
+  // Dashboard
+  { name: 'Dashboard', href: '/dashboard', iconPath: '/images/sidebar/hrm_system.svg' },
   
   // HRM System
   { name: 'HRM System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
@@ -143,17 +138,7 @@ export function Sidebar() {
             {displayedItems.map((item, index) => {
               const key = item.name + (item.href || index);
               const isActive = pathname === item.href;
-              const isDropdown = [
-                'Dashboard',
-                'HRM System',
-                'Accounting System',
-                'CRM System',
-                'Project System',
-                'User Management',
-                'Products System',
-                'POS System',
-                'Support System',
-              ].includes(item.name);
+              const isDropdown = item.name === 'Project System';
               const children = grouped[item.name] || [];
               const hasActiveChild = children.some((c) => c.href && c.href !== '#' && pathname.startsWith(c.href));
               const opened = !!openMap[item.name] || hasActiveChild;
