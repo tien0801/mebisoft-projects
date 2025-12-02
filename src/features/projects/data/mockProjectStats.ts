@@ -5,6 +5,7 @@
  * @created 2025-11-29
  */
 
+
 export interface ProjectStats {
   totalTasks: number;
   doneTasks: number;
@@ -37,6 +38,6 @@ export const mockProjectStatistics: ProjectStatistic[] = [
 ];
 
 // Helper function to format currency
-export const formatCurrency = (amount: number): string => {
-  return `$ ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
+// export const formatCurrency = (amount: number): string => {
+//   return `$ ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+// };
