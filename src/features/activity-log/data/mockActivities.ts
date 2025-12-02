@@ -1,0 +1,60 @@
+import { Activity } from "@/features/activity-log/types";
+
+export const ACTIVITY_LOGS: Activity[] = [
+  {
+    id: "l1",
+    action: "Uploaded File",
+    user: "Sonya Sims",
+    target: "Design_System.fig",
+    time: "Just now",
+    type: "upload_attachment",
+  },
+  {
+    id: "l6",
+    action: "Deleted File",
+    user: "Sonya Sims",
+    target: "Draft_Layout_v1.png",
+    time: "30 mins ago",
+    type: "remove_attachment",
+  },
+  {
+    id: "l2",
+    action: "Invite User",
+    user: "Workdo",
+    target: "Sonya Sims",
+    time: "2 hours ago",
+    type: "add_member",
+  },
+  {
+    id: "l3",
+    action: "Uploaded File",
+    user: "Workdo",
+    target: "Requirements.pdf",
+    time: "5 hours ago",
+    type: "upload_attachment",
+  },
+  {
+    id: "l7",
+    action: "Remove User",
+    user: "Workdo",
+    target: "Sarah Connor",
+    time: "8 hours ago",
+    type: "remove_member",
+  },
+  {
+    id: "l4",
+    action: "Invite User",
+    user: "Workdo",
+    target: "Emma Hopper",
+    time: "1 day ago",
+    type: "add_member",
+  },
+  {
+    id: "l5",
+    action: "Invite User",
+    user: "Workdo",
+    target: "Richard Atkinson",
+    time: "1 day ago",
+    type: "add_member",
+  },
+];
