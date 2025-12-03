@@ -203,11 +203,11 @@ export function Header() {
               const isActive = pathname === item.href;
               const isDropdown = item.name === 'Dashboard';
               const children = grouped[item.name] || [];
-              const hasActiveChild = children.some((c) => c.href !== '#' && pathname.startsWith(c.href));
+              const hasActiveChild = children.some((c) => c.href !== '#' && pathname.startsWith((c as any).href));
               const opened = !!mobileOpenMap[item.name] || hasActiveChild;
 
               if (isDropdown) {
-                const rootChildren = children.filter((c) => !c.parent);
+                const rootChildren = children.filter((c) => !(c as any).parent);
 
                 return (
                   <li key={key}>
@@ -240,18 +240,21 @@ export function Header() {
                       {opened && rootChildren.length > 0 && (
                         <ul className="menuListNested">
                           {rootChildren.map((c) => {
-                            const childActive = pathname === c.href;
-                            return (
-                              <li key={c.href}>
-                                <Link
-                                  href={c.href}
-                                  className={cn('menuItem', 'nested', childActive && 'active')}
-                                  onClick={() => setMobileSidebarOpen(false)}
-                                >
-                                  <span className="label">{c.name}</span>
-                                </Link>
-                              </li>
-                            );
+                            if (c.href) {
+                              const childActive = pathname === c.href;
+                              return (
+                                <li key={c.href}>
+                                  <Link
+                                    href={c.href}
+                                    className={cn('menuItem', 'nested', childActive && 'active')}
+                                    onClick={() => setMobileSidebarOpen(false)}
+                                  >
+                                    <span className="label">{c.name}</span>
+                                  </Link>
+                                </li>
+                              );
+                            }
+                            return null;
                           })}
                         </ul>
                       )}
@@ -260,20 +263,23 @@ export function Header() {
                 );
               }
 
-              return (
-                <li key={key}>
-                  <Link
-                    href={item.href}
-                    className={cn('menuItem', isActive && 'active')}
-                    onClick={() => setMobileSidebarOpen(false)}
-                  >
-                    <span className="icon">
-                      <Image src={item.iconPath} alt={item.name} width={36} height={36} />
-                    </span>
-                    <span className="label">{item.name}</span>
-                  </Link>
-                </li>
-              );
+              if (item.href) {
+                return (
+                  <li key={key}>
+                    <Link
+                      href={item.href}
+                      className={cn('menuItem', isActive && 'active')}
+                      onClick={() => setMobileSidebarOpen(false)}
+                    >
+                      <span className="icon">
+                        <Image src={item.iconPath} alt={item.name} width={36} height={36} />
+                      </span>
+                      <span className="label">{item.name}</span>
+                    </Link>
+                  </li>
+                );
+              }
+              return null;
             })}
           </ul>
         </aside>
