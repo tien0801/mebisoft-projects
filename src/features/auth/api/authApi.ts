@@ -33,7 +33,10 @@ export const authApi = {
   },
 
   logout: async (): Promise<void> => {
-    await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
+    // Mock logout - không cần call API
+    // Khi có backend thật, uncomment dòng dưới:
+    // await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
+    return Promise.resolve();
   },
 
   refreshToken: async (refreshToken: string): Promise<AuthResponse> => {

@@ -101,19 +101,17 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: async () => {
-        try {
-          // Call API to logout
-          await authApi.logout();
-        } catch (error) {
-          // Even if API fails, clear local state
-          console.error('Logout error:', error);
-        } finally {
-          set({
-            user: null,
-            token: null,
-            isAuthenticated: false,
-          });
+      logout: () => {
+        // Clear local state immediately (no need to call API for mock)
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+        });
+        
+        // Redirect to login page
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
         }
       },
     }),
