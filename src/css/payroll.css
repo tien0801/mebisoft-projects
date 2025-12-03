@@ -1,0 +1,563 @@
+.payroll-slip-page .note-row {
+  gap: 12px;
+}
+
+.payroll-list-page .payroll-table tr:last-child,
+.payroll-detail-page .payroll-table tr:last-child,
+.payroll-payslip-page .payroll-table tr:last-child,
+.payroll-setup-page .payroll-table tr:last-child {
+  border-bottom: none;
+}
+
+.payroll-list-page > .page-header:not(.column),
+.payroll-detail-page > .page-header:not(.column),
+.payroll-payslip-page > .page-header:not(.column),
+.payroll-setup-page > .page-header:not(.column),
+.payroll-slip-page > .page-header:not(.column) {
+  position: sticky;
+  top: calc(var(--header-height, 88px) + 8px);
+  z-index: 180;
+  background: #f9fafb;
+  padding: 12px 0 14px;
+}
+
+@media (max-width: 768px) {
+  .payroll-list-page .payroll-table tr,
+  .payroll-detail-page .payroll-table tr,
+  .payroll-payslip-page .payroll-table tr,
+  .payroll-setup-page .payroll-table tr {
+    padding: 8px 10px;
+  }
+
+  .payroll-slip-page .note-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .payroll-list-page > .page-header:not(.column),
+  .payroll-detail-page > .page-header:not(.column),
+  .payroll-payslip-page > .page-header:not(.column),
+  .payroll-setup-page > .page-header:not(.column),
+  .payroll-slip-page > .page-header:not(.column) {
+    top: calc(var(--mobile-header-height, 120px) + 8px);
+    padding: 10px 0 12px;
+  }
+}
+
+.antd-payroll-setup .payroll-setup-card {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+  overflow: hidden;
+  background: #ffff;
+}
+
+.payroll-setup-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 12px;
+}
+
+.payroll-setup-toolbar .toolbar-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.payroll-setup-toolbar .entries-label {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.payroll-setup-toolbar .payroll-search {
+  max-width: 260px;
+}
+
+.payroll-setup-table .ant-table-thead > tr > th {
+  background: #f8fafc;
+  font-weight: 700;
+  color: #111827;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.payroll-setup-table .ant-table-container {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #eef2f7;
+}
+
+.payroll-setup-table .ant-table {
+  border-radius: 12px;
+}
+
+.payroll-setup-table.ant-table-wrapper {
+  background: #fff;
+  border-radius: 16px;
+}
+
+.payroll-setup-table .ant-table-tbody > tr > td {
+  padding: 16px 12px;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.payroll-id-pill {
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid #22c55e;
+  background: #f0fdf4;
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.payroll-action-btn {
+  background: #f5a623;
+  border: none;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.32);
+}
+
+.payroll-action-btn:hover,
+.payroll-action-btn:focus {
+  background: #f0a000 !important;
+  color: #fff;
+}
+
+.payroll-setup-table .ant-pagination {
+  margin-top: 16px;
+}
+
+:where(.css-dev-only-do-not-override-198drv2).ant-table-wrapper .ant-table-pagination.ant-pagination {
+  margin-right: 25px;
+}
+.ant-table-wrapper .ant-table-pagination.ant-pagination{
+  margin-right: 30px;
+}
+:where(.css-dev-only-do-not-override-198drv2).ant-table-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.payroll-setup-table .ant-pagination-total-text {
+  font-size: 14px;
+  color: #1f2937;
+  margin-right: auto;
+  padding-left: 15px;
+}
+
+.payroll-setup-table .ant-pagination .ant-pagination-item {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  min-width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payroll-setup-table .ant-pagination .ant-pagination-item a {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.payroll-setup-table .ant-pagination .ant-pagination-item-active {
+  background: #4cc758;
+  border-color: #4cc758;
+}
+
+.payroll-setup-table .ant-pagination .ant-pagination-item-active a {
+  color: #ffffff;
+}
+
+.payroll-setup-table .ant-pagination .ant-pagination-prev,
+.payroll-setup-table .ant-pagination .ant-pagination-next {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  min-width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payroll-setup-table .ant-pagination .ant-pagination-prev button,
+.payroll-setup-table .ant-pagination .ant-pagination-next button {
+  color: #4b5563;
+}
+
+.payroll-setup-table .ant-pagination .ant-pagination-prev button:disabled,
+.payroll-setup-table .ant-pagination .ant-pagination-next button:disabled {
+  color: #9ca3af;
+}
+
+/* Set Salary detail page */
+.set-salary-page {
+  background: linear-gradient(145deg, #f5f7fb 0%, #eef2f7 100%);
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.set-salary-card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+}
+
+.set-salary-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 17px;
+  width: 3px;
+  height: 26px;
+  border-radius: 0 4px 4px 0;
+  background: #4ade80;
+}
+
+.set-salary-card .ant-card-head {
+  padding: 12px 16px;
+  border-bottom: none;
+}
+
+.set-salary-card .ant-card-head-title {
+  padding: 0;
+  font-weight: 600;
+  color: #111827;
+}
+
+.set-salary-card .ant-card-extra {
+  padding: 0;
+}
+
+.set-salary-card .ant-card-body {
+  padding: 0;
+}
+
+.add-btn {
+  background: #4ade80;
+  border-color: #4ade80;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(74, 222, 128, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 36px;
+}
+
+.add-btn:hover,
+.add-btn:focus {
+  background: #39c870 !important;
+  border-color: #39c870 !important;
+  color: #0f5132 !important;
+}
+
+.set-salary-table .ant-table-container {
+  border: none;
+  border-radius: 0 0 16px 16px;
+}
+
+.set-salary-table .ant-table {
+  border-radius: 0 0 16px 16px;
+}
+
+
+
+.set-salary-table-wrapper {
+  overflow-x: hidden; /* ẩn thanh cuộn bên ngoài, cuộn nằm trong table khi cần */
+  overflow-y: hidden;
+}
+
+
+
+.set-salary-table .ant-table-thead > tr > th {
+  background: #f7f9fb;
+  font-weight: 700;
+  color: #111827;
+  text-transform: uppercase;
+  font-size: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  border-inline-end: none;
+}
+
+.set-salary-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #edf0f4;
+  color: #1f2937;
+  height: 50px;
+  font-size: 14px;
+}
+
+.set-salary-table .placeholder-row > td {
+  height: auto;
+  padding: 0px 12px;
+}
+
+.action-btn {
+  border: none;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.12);
+  font-size: 16px;
+}
+
+.action-btn.edit-btn {
+  background: #27c3e6;
+}
+
+.action-btn.delete-btn {
+  background: #ff4d73;
+}
+
+.action-btn:hover,
+.action-btn:focus {
+  opacity: 0.92;
+  color: #fff;
+}
+
+/* Modal styling */
+.salary-modal .ant-modal-content {
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+}
+
+.salary-modal .ant-modal-header {
+  padding: 0px 24px 0px;
+  border-bottom: 1px solid #eef0f2;
+  background: #fff;
+}
+
+.salary-modal .ant-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.salary-modal .ant-modal-close {
+  top: 14px;
+  right: 14px;
+}
+
+.salary-modal .ant-modal-footer {
+  border-top: 1px solid #eef0f2;
+  display: flex;
+  justify-content: flex-end !important;
+  gap: 10px;
+  padding: 24px 0px 8px;
+  background: #fff;
+}
+
+.salary-modal .ant-modal-body {
+  padding: 18px 0px 0px;
+  background: #fff;
+}
+
+.modal-ok-btn {
+  background: #58c22c;
+  border-color: #58c22c;
+  min-width: 138px;
+  height: 42px;
+  border-radius: 10px;
+  font-weight: 700;
+  box-shadow: 0 12px 24px rgba(88, 194, 44, 0.32);
+}
+
+.modal-ok-btn:hover,
+.modal-ok-btn:focus {
+  background: #4ba924 !important;
+  border-color: #4ba924 !important;
+}
+
+.modal-cancel-btn {
+  background: #6a6f79;
+  border-color: #6a6f79;
+  color: #fff;
+  min-width: 118px;
+  height: 42px;
+  border-radius: 10px;
+  font-weight: 700;
+  box-shadow: 0 10px 22px rgba(107, 114, 128, 0.28);
+}
+
+.modal-cancel-btn:hover,
+.modal-cancel-btn:focus {
+  background: #575d69 !important;
+  border-color: #575d69 !important;
+  color: #fff !important;
+}
+
+.salary-modal .helper-text {
+  display: block;
+  margin-top: -14px;
+  margin-bottom: 18px;
+  color: #616a75;
+  font-size: 13px;
+}
+
+.salary-modal .helper-link {
+  color: #58c22c;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.salary-modal .helper-text.helper-spacer {
+  visibility: hidden;
+  margin-bottom: 18px;
+}
+
+.salary-modal .salary-form .ant-form-item {
+  margin-bottom: 18px;
+}
+
+.salary-modal .salary-form .ant-form-item-label > label {
+  font-weight: 700;
+  color: #111827;
+  font-size: 14px;
+}
+
+.salary-modal .salary-form .ant-form-item-required::before {
+  color: #ef4444 !important;
+}
+
+.salary-modal .ant-input,
+.salary-modal .ant-select-selector {
+  border-radius: 10px;
+  height: 46px;
+  padding: 8px 12px;
+  border: 1px solid #d7dce3;
+  transition: all 0.2s ease;
+}
+
+.salary-modal .ant-select-selector .ant-select-selection-placeholder,
+.salary-modal .ant-input::placeholder {
+  color: #9ca3af;
+}
+
+.salary-modal .ant-select:not(.ant-select-disabled):hover .ant-select-selector,
+.salary-modal .ant-input:hover {
+  border-color: #c9d0da;
+  box-shadow: none;
+}
+
+.salary-modal .ant-select-focused .ant-select-selector,
+.salary-modal .ant-input-affix-wrapper-focused,
+.salary-modal .ant-input-focused {
+  box-shadow: 0 0 0 3px rgba(88, 194, 44, 0.22);
+  border-color: #58c22c !important;
+}
+
+.confirm-modal .ant-modal-content {
+  border-radius: 14px;
+  padding: 40px 36px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.confirm-modal .ant-modal-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0;
+}
+
+.confirm-modal .confirm-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 4px solid #f8b451;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f8b451;
+  font-size: 34px;
+  font-weight: 700;
+  margin: 0 auto 18px;
+}
+
+.confirm-modal .confirm-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #374151;
+  margin: 0 0 10px;
+}
+
+.confirm-modal .confirm-desc {
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 26px;
+}
+
+.confirm-modal .confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.confirm-modal .confirm-btn {
+  min-width: 110px;
+  height: 42px;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #fff;
+  border: none;
+}
+
+.confirm-modal .confirm-no-btn {
+  background: #ff3d71;
+}
+
+.confirm-modal .confirm-yes-btn {
+  background: #58c22c;
+}
+
+.confirm-modal .confirm-btn:hover,
+.confirm-modal .confirm-btn:focus {
+  opacity: 0.95;
+  color: #fff;
+}
+
+.set-salary-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: 4px solid #d0d8f5;
+  border-radius: 4px;
+}
+
+.set-salary-table .ant-table-tbody > tr:hover > td {
+  background: #f1f5fb;
+}
+
+.ant-modal .ant-modal-title{
+  padding-bottom: 14px;
+}
+
+.ant-form-item .ant-form-item-label >label{
+  font-weight: 600;
+}
+
+
+.ant-table-wrapper .ant-table.ant-table-small .ant-table-title, .ant-table-wrapper .ant-table.ant-table-small .ant-table-footer, .ant-table-wrapper .ant-table.ant-table-small .ant-table-cell, .ant-table-wrapper .ant-table.ant-table-small .ant-table-thead>tr>th, .ant-table-wrapper .ant-table.ant-table-small .ant-table-tbody>tr>th, .ant-table-wrapper .ant-table.ant-table-small .ant-table-tbody>tr>td, .ant-table-wrapper .ant-table.ant-table-small tfoot>tr>th, .ant-table-wrapper .ant-table.ant-table-small tfoot>tr>td {
+  padding-left: 17px;
+}
