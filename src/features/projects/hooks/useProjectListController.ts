@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Project, ProjectMember, ProjectStatus } from '../types/project.types';
 import { useProjectStore } from '../store/projectStore';
 import { MOCK_USERS } from '../data/mockMember';
-import { ProjectFormData } from '../components/modal/create/CreateProjectModal';
+import { ProjectFormData } from '../components/modal/CreateProjectModal';
 
 type ViewMode = 'grid' | 'list';
 type SortOption = 'newest' | 'oldest' | 'a-z' | 'z-a';

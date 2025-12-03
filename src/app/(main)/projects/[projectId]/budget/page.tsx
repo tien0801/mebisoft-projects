@@ -9,11 +9,11 @@ import { ProjectBudget } from '@/features/projects/components/ProjectBudget';
 
 interface ProjectBudgetPageProps {
   params: Promise<{
-    id: string;
+    projectId: string;
   }>;
 }
 
 export default async function ProjectBudgetPage({ params }: ProjectBudgetPageProps) {
-  const { id } = await params;
-  return <ProjectBudget projectId={id} />;
+  const { projectId } = await params;
+  return <ProjectBudget projectId={projectId} />;
 }
