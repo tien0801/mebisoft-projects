@@ -145,14 +145,14 @@ export function Sidebar() {
               const isActive = pathname === item.href;
               const isDropdown = [
                 'Dashboard',
-                'HRM System',
-                'Accounting System',
-                'CRM System',
+                // 'HRM System',
+                // 'Accounting System',
+                // 'CRM System',
                 'Project System',
-                'User Management',
-                'Products System',
-                'POS System',
-                'Support System',
+                // 'User Management',
+                // 'Products System',
+                // 'POS System',
+                // 'Support System',
               ].includes(item.name);
               const children = grouped[item.name] || [];
               const hasActiveChild = children.some((c) => c.href && c.href !== '#' && pathname.startsWith(c.href));
