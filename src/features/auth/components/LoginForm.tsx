@@ -1,8 +1,8 @@
 /**
  * @file LoginForm.tsx
- * @description LoginForm component
- * @author Kindy
- * @created 2025-11-16
+ * @description LoginForm component - Với mock data
+ * @author Mebisoft Team
+ * @created 2025-11-22
  */
 
 'use client';
@@ -14,9 +14,9 @@ import { useAuth } from '../hooks/useAuth';
 
 export function LoginForm() {
   const router = useRouter();
-  const { login, loading } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { loginMock, loading } = useAuth();
+  const [email, setEmail] = useState('admin@example.com');
+  const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -30,11 +30,18 @@ export function LoginForm() {
     }
 
     try {
-      await login({ email, password });
+      // Sử dụng loginMock thay vì login
+      loginMock({ email, password });
       router.push('/dashboard');
     } catch (err) {
-      setError('Đăng nhập thất bại. Vui lòng thử lại.');
+      setError(err instanceof Error ? err.message : 'Đăng nhập thất bại. Vui lòng thử lại.');
     }
+  };
+
+  // Quick login buttons
+  const quickLogin = (email: string, password: string) => {
+    setEmail(email);
+    setPassword(password);
   };
 
   return (

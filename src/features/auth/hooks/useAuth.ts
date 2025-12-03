@@ -16,6 +16,7 @@ export function useAuth() {
     isAuthenticated,
     loading,
     login,
+    loginMock,
     register,
     logout,
   } = useAuthStore();
@@ -26,6 +27,7 @@ export function useAuth() {
     isAuthenticated,
     loading,
     login,
+    loginMock,
     register,
     logout,
   };

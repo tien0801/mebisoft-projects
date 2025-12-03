@@ -14,14 +14,14 @@ export default function LoginPage() {
       <div className="absolute inset-0 overflow-hidden">
         {/* Grid pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full" 
-               style={{
-                 backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
-                 backgroundSize: '50px 50px'
-               }}>
+          <div className="absolute top-0 left-0 w-full h-full"
+            style={{
+              backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+              backgroundSize: '50px 50px'
+            }}>
           </div>
         </div>
-        
+
         {/* Glowing circles */}
         <div className="absolute top-20 left-20 w-64 h-64 bg-blue-400 rounded-full opacity-10 blur-3xl"></div>
         <div className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-400 rounded-full opacity-10 blur-3xl"></div>

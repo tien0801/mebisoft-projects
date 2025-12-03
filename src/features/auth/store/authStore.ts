@@ -18,6 +18,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
+  loginMock: (credentials: LoginCredentials) => void;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
 }
@@ -44,6 +45,42 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({ loading: false });
           throw error;
+        }
+      },
+
+      // Mock login - Không cần backend
+      loginMock: (credentials: LoginCredentials) => {
+        set({ loading: true });
+        
+        // Mock users data
+        const mockUsers = [
+          { email: 'admin@example.com', password: 'admin123', name: 'Admin User', role: 'admin' },
+          { email: 'user@example.com', password: 'user123', name: 'Regular User', role: 'user' },
+          { email: 'demo@mebisoft.com', password: 'demo123', name: 'Demo User', role: 'user' },
+        ];
+
+        // Tìm user
+        const user = mockUsers.find(
+          (u) => u.email === credentials.email && u.password === credentials.password
+        );
+
+        if (user) {
+          // Login thành công
+          set({
+            user: {
+              id: `mock-${Date.now()}`,
+              email: user.email,
+              name: user.name,
+              role: user.role,
+            },
+            token: `mock-token-${Date.now()}`,
+            isAuthenticated: true,
+            loading: false,
+          });
+        } else {
+          // Login thất bại
+          set({ loading: false });
+          throw new Error('Email hoặc mật khẩu không đúng');
         }
       },
 
