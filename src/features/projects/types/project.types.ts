@@ -15,6 +15,14 @@ export enum ProjectStatus {
   CANCELLED = 'cancelled',         // Hủy bỏ
 }
 
+// Enum cho loại dự án
+export enum ProjectType {
+  DOMESTIC = 'domestic',
+  INTERNATIONAL = 'international',
+  MEDICAL = 'medical',
+  BUSINESS = 'business',
+}
+
 // Label hiển thị cho từng status
 export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   [ProjectStatus.PLANNING]: 'Lên kế hoạch',
@@ -35,6 +43,14 @@ export const PROJECT_STATUS_COLORS: Record<ProjectStatus, string> = {
   [ProjectStatus.CANCELLED]: 'bg-red-100 text-red-700',           // Đỏ
 };
 
+// Label hiển thị cho loại dự án
+export const PROJECT_TYPE_LABELS: Record<ProjectType, string> = {
+  [ProjectType.DOMESTIC]: 'Domestic Project',
+  [ProjectType.INTERNATIONAL]: 'International Project',
+  [ProjectType.MEDICAL]: 'Medical Project',
+  [ProjectType.BUSINESS]: 'Business Project',
+};
+
 // Interface thành viên dự án
 export interface ProjectMember {
   id: string;
@@ -51,6 +67,21 @@ export interface ProjectTask {
   endDate: string;    // ISO format
   status?: ProjectStatus;
   assignedTo?: ProjectMember[];
+  bugReports?: string[]; // IDs of bug reports
+}
+
+// Interface cho tracker entry của project
+export interface ProjectTrackerEntry {
+  id: string;
+  projectId: string;
+  description: string;
+  taskId?: string;
+  taskName: string;
+  startTime: string; // HH:mm:ss
+  endTime: string;   // HH:mm:ss
+  date?: string;     // ISO date
+  billable?: boolean;
+  source?: 'tracker' | 'timesheet';
 }
 
 // Interface chính cho Project
@@ -59,10 +90,12 @@ export interface Project {
   name: string;                    // Tên dự án
   description: string;             // Mô tả ngắn
   status: ProjectStatus;           // Trạng thái
+  projectType?: ProjectType;       // Loại dự án
   startDate: string;               // Ngày bắt đầu (ISO format)
   endDate: string;                 // Ngày kết thúc (ISO format)
   members: ProjectMember[];        // Danh sách thành viên
   tasks?: ProjectTask[];           // Danh sách tasks trong project
+  trackerEntries?: ProjectTrackerEntry[]; // Các bản ghi tracker
   clientId?: string;               // ID khách hàng (liên kết hệ thống 2)
   managerId?: string;              // ID người phụ trách (liên kết hệ thống 3)
   imageUrl?: string;                  // URL hình ảnh project
@@ -74,6 +107,7 @@ export interface Project {
 // Interface cho filter projects
 export interface ProjectFilter {
   status?: ProjectStatus;
+  projectType?: ProjectType;
   search?: string;
   startDate?: string;
   endDate?: string;

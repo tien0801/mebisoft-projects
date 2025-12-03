@@ -7,182 +7,49 @@
 
 'use client';
 
-import { useState, useMemo, useEffect, useRef } from 'react';
 import { Search, Eye, Edit2, RotateCw } from 'lucide-react';
 import Link from 'next/link';
-import { useProjectStore } from '../store/projectStore';
-import { Project, ProjectStatus, PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS } from '../types/project.types';
-import { stringToColor, getPriorityFromProject, calculateProjectCompletion } from '../../tasks/utils/task.utils';
+import { ProjectStatus, ProjectType, PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS, PROJECT_TYPE_LABELS } from '../types/project.types';
+import { stringToColor, calculateProjectCompletion } from '../../tasks/utils/task.utils';
 import { ProjectDetailsModal } from './modal/ProjectDetailsModal';
 import { UpdateStatusModal } from './modal/UpdateStatusModal';
+import { useProjectReportsController } from '../hooks/useProjectReportsController';
 
 export const ProjectReports = () => {
-    const { projects, setSelectedProject } = useProjectStore();
-
-    // Temporary states for form inputs (not applied yet)
-    const [tempSearchQuery, setTempSearchQuery] = useState('');
-    const [tempStatusFilter, setTempStatusFilter] = useState<ProjectStatus | 'all'>('all');
-    const [tempSelectedUser, setTempSelectedUser] = useState<string>('all');
-    const [tempStartDate, setTempStartDate] = useState('');
-    const [tempEndDate, setTempEndDate] = useState('');
-
-    // Applied filter states (only update when Search is clicked)
-    const [searchQuery, setSearchQuery] = useState('');
-    const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
-    const [selectedUser, setSelectedUser] = useState<string>('all');
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-
-    // Debounced search for table search box
-    const [debouncedTableSearch, setDebouncedTableSearch] = useState('');
-    const [tableSearchInput, setTableSearchInput] = useState('');
-    const debounceTimer = useRef<NodeJS.Timeout | null>(null);
-
-    const [entriesPerPage, setEntriesPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
-
-    // Modal states
-    const [selectedProject, setSelectedProjectModal] = useState<Project | null>(null);
-    const [showDetailsModal, setShowDetailsModal] = useState(false);
-    const [showStatusModal, setShowStatusModal] = useState(false);
-    const [projectToUpdate, setProjectToUpdate] = useState<Project | null>(null);    // Debounce logic for table search input
-    const handleTableSearchChange = (value: string) => {
-        setTableSearchInput(value);
-
-        // Clear previous timer
-        if (debounceTimer.current) {
-            clearTimeout(debounceTimer.current);
-        }
-
-        // Set new timer - apply filter after 500ms of no typing
-        debounceTimer.current = setTimeout(() => {
-            setDebouncedTableSearch(value);
-            setCurrentPage(1);
-        }, 500);
-    };
-
-    // Get unique users from all projects
-    const allUsers = useMemo(() => {
-        const users = new Set<string>();
-        projects.forEach(project => {
-            project.members?.forEach(member => {
-                users.add(member.name);
-            });
-        });
-        return Array.from(users).sort();
-    }, [projects]);
-
-    // Filter projects based on criteria
-    const filteredProjects = useMemo(() => {
-        let filtered = [...projects];
-
-        // Filter by status (from filter panel)
-        if (statusFilter !== 'all') {
-            filtered = filtered.filter(p => p.status === statusFilter);
-        }
-
-        // Filter by user (from filter panel)
-        if (selectedUser !== 'all') {
-            filtered = filtered.filter(p =>
-                p.members?.some(m => m.name === selectedUser)
-            );
-        }
-
-        // Filter by search query (from filter panel)
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
-            filtered = filtered.filter(p =>
-                p.name.toLowerCase().includes(query) ||
-                p.description.toLowerCase().includes(query)
-            );
-        }
-
-        // Filter by date range (from filter panel)
-        if (startDate) {
-            filtered = filtered.filter(p =>
-                new Date(p.startDate) >= new Date(startDate)
-            );
-        }
-
-        if (endDate) {
-            filtered = filtered.filter(p =>
-                new Date(p.endDate) <= new Date(endDate)
-            );
-        }
-
-        // Filter by table search (debounced, auto-applies)
-        if (debouncedTableSearch.trim()) {
-            const query = debouncedTableSearch.toLowerCase();
-            filtered = filtered.filter(p => {
-                // Search by project name
-                const nameMatch = p.name.toLowerCase().includes(query) ||
-                    p.description.toLowerCase().includes(query);
-
-                // Search by status
-                const statusMatch = PROJECT_STATUS_LABELS[p.status].toLowerCase().includes(query);
-
-                // Search by start date (formatted as dd/mm/yyyy or mm/dd/yyyy)
-                const startDateStr = new Date(p.startDate).toLocaleDateString('en-GB');
-                const startDateMatch = startDateStr.includes(query);
-
-                // Search by end date (formatted as dd/mm/yyyy or mm/dd/yyyy)
-                const endDateStr = new Date(p.endDate).toLocaleDateString('en-GB');
-                const endDateMatch = endDateStr.includes(query);
-
-                return nameMatch || statusMatch || startDateMatch || endDateMatch;
-            });
-        }
-
-        return filtered;
-    }, [projects, statusFilter, selectedUser, searchQuery, startDate, endDate, debouncedTableSearch]);
-
-    // Pagination
-    const totalPages = Math.ceil(filteredProjects.length / entriesPerPage);
-    const paginatedProjects = useMemo(() => {
-        const start = (currentPage - 1) * entriesPerPage;
-        return filteredProjects.slice(start, start + entriesPerPage);
-    }, [filteredProjects, currentPage, entriesPerPage]);
-
-    const handleViewDetails = (project: Project) => {
-        setSelectedProjectModal(project);
-        setSelectedProject(project);
-        setShowDetailsModal(true);
-    };
-
-    const handleUpdateStatus = (project: Project) => {
-        setProjectToUpdate(project);
-        setShowStatusModal(true);
-    };
-
-    const handleApplyFilters = () => {
-        setSearchQuery(tempSearchQuery);
-        setStatusFilter(tempStatusFilter);
-        setSelectedUser(tempSelectedUser);
-        setStartDate(tempStartDate);
-        setEndDate(tempEndDate);
-        setCurrentPage(1);
-    };
-
-    const handleResetFilters = () => {
-        // Reset temporary states
-        setTempSearchQuery('');
-        setTempStatusFilter('all');
-        setTempSelectedUser('all');
-        setTempStartDate('');
-        setTempEndDate('');
-
-        // Reset table search
-        setTableSearchInput('');
-        setDebouncedTableSearch('');
-
-        // Reset applied filters
-        setSearchQuery('');
-        setStatusFilter('all');
-        setSelectedUser('all');
-        setStartDate('');
-        setEndDate('');
-        setCurrentPage(1);
-    };
+    const {
+        allUsers,
+        tempSearchQuery,
+        setTempSearchQuery,
+        tempStatusFilter,
+        setTempStatusFilter,
+        tempProjectTypeFilter,
+        setTempProjectTypeFilter,
+        tempSelectedUser,
+        setTempSelectedUser,
+        tempStartDate,
+        setTempStartDate,
+        tempEndDate,
+        setTempEndDate,
+        tableSearchInput,
+        handleTableSearchChange,
+        entriesPerPage,
+        setEntriesPerPage,
+        currentPage,
+        setCurrentPage,
+        paginatedProjects,
+        filteredProjects,
+        totalPages,
+        handleApplyFilters,
+        handleResetFilters,
+        handleViewDetails,
+        handleUpdateStatus,
+        selectedProject,
+        showDetailsModal,
+        closeDetailsModal,
+        projectToUpdate,
+        showStatusModal,
+        closeStatusModal,
+    } = useProjectReportsController();
 
     const getInitials = (name: string) => {
         return name
@@ -207,7 +74,7 @@ export const ProjectReports = () => {
 
             {/* Filters */}
             <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                     {/* Users Filter */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Users</label>
@@ -238,6 +105,23 @@ export const ProjectReports = () => {
                             <option value="all">Select Status</option>
                             {Object.entries(PROJECT_STATUS_LABELS).map(([status, label]) => (
                                 <option key={status} value={status}>{label}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Project Type Filter */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Project Type</label>
+                        <select
+                            value={tempProjectTypeFilter}
+                            onChange={(e) => {
+                                setTempProjectTypeFilter(e.target.value as ProjectType | 'all');
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black bg-white"
+                        >
+                            <option value="all">All Types</option>
+                            {Object.entries(PROJECT_TYPE_LABELS).map(([type, label]) => (
+                                <option key={type} value={type}>{label}</option>
                             ))}
                         </select>
                     </div>
@@ -386,7 +270,7 @@ export const ProjectReports = () => {
                                         <td className="px-6 py-4">
                                             <div className="flex gap-2">
                                                 <Link
-                                                    href={`/reports/${project.id}`}
+                                                    href={`/reportboard/${project.id}`}
                                                     className="p-2 text-gray-500 hover:text-blue-600 transition"
                                                     title="View Details"
                                                 >
@@ -439,13 +323,13 @@ export const ProjectReports = () => {
             <ProjectDetailsModal
                 project={selectedProject}
                 isOpen={showDetailsModal}
-                onClose={() => setShowDetailsModal(false)}
+                onClose={closeDetailsModal}
             />
 
             <UpdateStatusModal
                 project={projectToUpdate}
                 isOpen={showStatusModal}
-                onClose={() => setShowStatusModal(false)}
+                onClose={closeStatusModal}
                 onUpdate={(projectId: string, newStatus: ProjectStatus) => {
                     // TODO: Persist status update to store
                     console.log(`Update project ${projectId} to ${newStatus}`);

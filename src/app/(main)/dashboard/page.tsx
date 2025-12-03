@@ -7,6 +7,7 @@
 
 'use client';
 
+import Link from 'next/link';
 import { useAuth } from '@/features/auth';
 import { Card } from '@/shared/components/ui';
 
@@ -76,32 +77,32 @@ export default function DashboardPage() {
       <div className="mt-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Truy Cập Nhanh</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <a
+          <Link
             href="/projects"
             className="p-6 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
           >
             <div className="text-3xl mb-3">📁</div>
             <h3 className="font-semibold text-gray-900 mb-1">Quản Lý Dự Án</h3>
             <p className="text-sm text-gray-600">Xem và quản lý tất cả dự án</p>
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/clients"
             className="p-6 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
           >
             <div className="text-3xl mb-3">👥</div>
             <h3 className="font-semibold text-gray-900 mb-1">Khách Hàng</h3>
             <p className="text-sm text-gray-600">Quản lý thông tin khách hàng</p>
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/reports"
             className="p-6 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
           >
             <div className="text-3xl mb-3">📈</div>
             <h3 className="font-semibold text-gray-900 mb-1">Báo Cáo</h3>
             <p className="text-sm text-gray-600">Xem báo cáo và thống kê</p>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

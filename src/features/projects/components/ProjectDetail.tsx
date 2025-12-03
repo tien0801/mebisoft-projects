@@ -7,16 +7,12 @@
 
 'use client';
 
-import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, Plus, Share2, Edit3, Calendar, DollarSign, Clock } from 'lucide-react';
-import { useProjectStore } from '../store/projectStore';
-import { calculateProjectCompletion, stringToColor } from '../../tasks/utils/task.utils';
+import { stringToColor } from '../../tasks/utils/task.utils';
 import { PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS } from '../types/project.types';
-
-interface ProjectDetailProps {
-  projectId: string;
-}
+import { ProjectDetailProps } from '../types/project-component.types';
+import { useProjectDetailController } from '../hooks/useProjectDetailController';
 
 const getInitials = (name: string) => {
   return name
@@ -28,12 +24,7 @@ const getInitials = (name: string) => {
 };
 
 export const ProjectDetail = ({ projectId }: ProjectDetailProps) => {
-  const { projects } = useProjectStore();
-  const [activeTab, setActiveTab] = useState<'gantt' | 'tracker' | 'expense' | 'timesheet' | 'bug' | 'task'>('gantt');
-
-  const project = useMemo(() => {
-    return projects.find(p => p.id === projectId);
-  }, [projects, projectId]);
+  const { project, completion, activeTab, setActiveTab } = useProjectDetailController(projectId);
 
   if (!project) {
     return (
@@ -42,8 +33,6 @@ export const ProjectDetail = ({ projectId }: ProjectDetailProps) => {
       </div>
     );
   }
-
-  const completion = calculateProjectCompletion(project);
 
   return (
     <div className="min-h-screen bg-gray-50">

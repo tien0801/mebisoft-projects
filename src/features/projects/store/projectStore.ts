@@ -8,9 +8,10 @@
 'use client';
 
 import { create } from 'zustand';
-import { Project, ProjectFilter, Client } from '../types';
+import { Project, ProjectFilter, Client, ProjectStatus, ProjectTrackerEntry, BugReport } from '../types';
 import { MOCK_PROJECTS } from '../data/mockProject';
-import { MOCK_CLIENTS  } from '../data/mockMember';
+import { MOCK_CLIENTS } from '../data/mockMember';
+import { MOCK_BUG_REPORTS } from '../data/mockBugReports';
 
 
 
@@ -21,6 +22,7 @@ interface ProjectState {
   clients: Client[]; // Danh sách tất cả clients (mock data)
   selectedProject: Project | null; // Project đang được chọn
   filter: ProjectFilter; // Bộ lọc hiện tại
+  bugReports: BugReport[]; // Danh sách bug report cho các project
 
   // Actions
   getClientById: (clientId: string) => Client | undefined; // Lấy client theo ID
@@ -29,6 +31,12 @@ interface ProjectState {
   clearFilter: () => void;                              // Xóa filter
   addProject: (project: Project) => void;               // Thêm project mới
   getFilteredProjects: () => Project[];                 // Lấy danh sách đã filter
+  updateTaskStatus: (projectId: string, taskId: string, status: ProjectStatus) => void;
+  addTrackerEntry: (projectId: string, entry: ProjectTrackerEntry) => void;
+  updateTrackerEntry: (projectId: string, entryId: string, updater: (entry: ProjectTrackerEntry) => ProjectTrackerEntry) => void;
+  addBugReport: (bug: BugReport) => void;
+  updateBugReport: (bugId: string, updater: (bug: BugReport) => BugReport) => void;
+  removeBugReport: (bugId: string) => void;
 }
 
 /**
@@ -42,15 +50,16 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   clients: MOCK_CLIENTS,
   selectedProject: null,
   filter: {},
+  bugReports: MOCK_BUG_REPORTS,
 
   // Actions
   getClientById: (clientId) => {
     return get().clients.find((c) => c.id === clientId);
   },
   setSelectedProject: (project) => set({ selectedProject: project }),
-  
+
   setFilter: (filter) => set({ filter }),
-  
+
   clearFilter: () => set({ filter: {} }),
 
   // Thêm project mới
@@ -61,7 +70,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   // Lấy danh sách projects đã filter
   getFilteredProjects: () => {
     const { projects, filter } = get();
-    
+
     // Nếu không có filter, trả về tất cả
     if (!filter.status && !filter.search) {
       return projects;
@@ -83,4 +92,73 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
     return filtered;
   },
+
+  updateTaskStatus: (projectId, taskId, status) => set((state) => {
+    const mutateTasks = (project: Project): Project => {
+      if (project.id !== projectId || !project.tasks) return project;
+
+      const updatedTasks = project.tasks.map((task) =>
+        task.id === taskId ? { ...task, status } : task
+      );
+
+      const updatedProject = { ...project, tasks: updatedTasks };
+      return updatedProject;
+    };
+
+    const updatedProjects = state.projects.map(mutateTasks);
+    const updatedSelectedProject = state.selectedProject
+      ? mutateTasks(state.selectedProject)
+      : null;
+
+    return {
+      projects: updatedProjects,
+      selectedProject: updatedSelectedProject,
+    };
+  }),
+
+  addTrackerEntry: (projectId, entry) => set((state) => {
+    const mutate = (project: Project): Project => {
+      if (project.id !== projectId) return project;
+
+      const trackerEntries = project.trackerEntries ?? [];
+      return {
+        ...project,
+        trackerEntries: [entry, ...trackerEntries],
+      };
+    };
+
+    const projects = state.projects.map(mutate);
+    const selectedProject = state.selectedProject ? mutate(state.selectedProject) : null;
+
+    return { projects, selectedProject };
+  }),
+
+  updateTrackerEntry: (projectId, entryId, updater) => set((state) => {
+    const mutate = (project: Project): Project => {
+      if (project.id !== projectId || !project.trackerEntries) return project;
+
+      const trackerEntries = project.trackerEntries.map((entry) =>
+        entry.id === entryId ? updater(entry) : entry
+      );
+
+      return { ...project, trackerEntries };
+    };
+
+    const projects = state.projects.map(mutate);
+    const selectedProject = state.selectedProject ? mutate(state.selectedProject) : null;
+
+    return { projects, selectedProject };
+  }),
+
+  addBugReport: (bug) => set((state) => ({
+    bugReports: [bug, ...state.bugReports],
+  })),
+
+  updateBugReport: (bugId, updater) => set((state) => ({
+    bugReports: state.bugReports.map((bug) => (bug.id === bugId ? updater(bug) : bug)),
+  })),
+
+  removeBugReport: (bugId) => set((state) => ({
+    bugReports: state.bugReports.filter((bug) => bug.id !== bugId),
+  })),
 }));

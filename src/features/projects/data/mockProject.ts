@@ -6,7 +6,7 @@
  */
 
 
-import { Project, ProjectStatus } from '../types/project.types';
+import { Project, ProjectStatus, ProjectType } from '../types/project.types';
 
 // Mock data - 8 projects với 6 trạng thái khác nhau
 export const MOCK_PROJECTS: Project[] = [
@@ -15,6 +15,7 @@ export const MOCK_PROJECTS: Project[] = [
         name: 'Dashboard UI',
         description: 'The goal of this project is to improve operational efficiency within the organization by implementing proven automation.',
         status: ProjectStatus.PLANNING,
+        projectType: ProjectType.DOMESTIC,
         startDate: '2025-07-20',
         endDate: '2027-07-20',
         members: [
@@ -55,6 +56,39 @@ export const MOCK_PROJECTS: Project[] = [
                 status: ProjectStatus.COMPLETED,
                 assignedTo: [{ id: '3', name: 'Mike Johnson', role: 'Designer' }]
             }
+        ],
+        trackerEntries: [
+            {
+                id: 'tracker-1',
+                projectId: '1',
+                description: 'Website Design set',
+                taskId: 'task-3',
+                taskName: 'Lunch meeting',
+                startTime: '12:28:50',
+                endTime: '12:31:59',
+                date: '2025-11-30'
+            },
+            {
+                id: 'tracker-2',
+                projectId: '1',
+                description: 'Dashboard cards',
+                taskId: 'task-4',
+                taskName: 'Finish the logo design',
+                startTime: '12:32:16',
+                endTime: '12:34:24',
+                date: '2025-11-30',
+                billable: true
+            },
+            {
+                id: 'tracker-3',
+                projectId: '1',
+                description: 'Dashboard cards',
+                taskId: 'task-4',
+                taskName: 'Finish the logo design',
+                startTime: '12:38:47',
+                endTime: '12:39:53',
+                date: '2025-11-30'
+            }
         ]
     },
     {
@@ -62,6 +96,7 @@ export const MOCK_PROJECTS: Project[] = [
         name: 'Newsletter Templates',
         description: 'The goal of this project is to improve operational efficiency within the organization by implementing proven automation.',
         status: ProjectStatus.PREPARING,
+        projectType: ProjectType.BUSINESS,
         startDate: '2021-04-25',
         endDate: '2021-07-20',
         members: [
@@ -94,6 +129,29 @@ export const MOCK_PROJECTS: Project[] = [
                 status: ProjectStatus.PREPARING,
                 assignedTo: [{ id: '6', name: 'Lisa Davis', role: 'QA' }]
             }
+        ],
+        trackerEntries: [
+            {
+                id: 'tracker-4',
+                projectId: '2',
+                description: 'Template kickoff meeting',
+                taskId: 'task-21',
+                taskName: 'Design email templates',
+                startTime: '09:00:00',
+                endTime: '10:45:00',
+                date: '2021-05-01'
+            },
+            {
+                id: 'tracker-5',
+                projectId: '2',
+                description: 'QA preparation',
+                taskId: 'task-23',
+                taskName: 'Quality assurance testing',
+                startTime: '14:10:00',
+                endTime: '16:00:00',
+                date: '2021-06-15',
+                billable: true
+            }
         ]
     },
     {
@@ -101,6 +159,7 @@ export const MOCK_PROJECTS: Project[] = [
         name: 'Payment Integration',
         description: 'The goal of this project is to improve operational efficiency within the organization by implementing proven automation.',
         status: ProjectStatus.IN_PROGRESS,
+        projectType: ProjectType.INTERNATIONAL,
         startDate: '2021-07-20',
         endDate: '2021-07-20',
         members: [
@@ -133,6 +192,18 @@ export const MOCK_PROJECTS: Project[] = [
                 status: ProjectStatus.IN_PROGRESS,
                 assignedTo: [{ id: '9', name: 'Chris Martin', role: 'QA' }]
             }
+        ],
+        trackerEntries: [
+            {
+                id: 'tracker-6',
+                projectId: '3',
+                description: 'Gateway workshop',
+                taskId: 'task-32',
+                taskName: 'Payment gateway integration',
+                startTime: '11:00:00',
+                endTime: '12:30:00',
+                date: '2021-08-18'
+            }
         ]
     },
     {
@@ -140,6 +211,7 @@ export const MOCK_PROJECTS: Project[] = [
         name: 'Website Launch',
         description: 'The goal of this project is to improve operational efficiency within the organization by implementing proven automation.',
         status: ProjectStatus.ON_HOLD,
+        projectType: ProjectType.MEDICAL,
         startDate: '2021-07-20',
         endDate: '2021-07-20',
         members: [
@@ -179,6 +251,7 @@ export const MOCK_PROJECTS: Project[] = [
         name: 'Website Builder',
         description: 'The goal of this project is to improve operational efficiency within the organization by implementing proven automation.',
         status: ProjectStatus.COMPLETED,
+        projectType: ProjectType.DOMESTIC,
         startDate: '2021-07-20',
         endDate: '2021-07-20',
         members: [
@@ -218,6 +291,7 @@ export const MOCK_PROJECTS: Project[] = [
         name: 'Component Library',
         description: 'The goal of this project is to improve operational efficiency within the organization by implementing proven automation.',
         status: ProjectStatus.CANCELLED,
+        projectType: ProjectType.BUSINESS,
         startDate: '2021-07-20',
         endDate: '2021-07-20',
         members: [
