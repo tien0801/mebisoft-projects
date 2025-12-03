@@ -15,6 +15,6 @@ interface TaskDetailPageProps {
 }
 
 export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
-    const { taskId } = await params;
-    return <TaskDetail taskId={taskId} />;
+    const { projectId, taskId } = await params;
+    return <TaskDetail taskId={taskId} projectId={projectId} />;
 }

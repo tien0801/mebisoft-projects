@@ -7,72 +7,22 @@
 
 'use client';
 
-import { useMemo } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useProjectStore } from '../../projects/store/projectStore';
-import { calculateProjectCompletion, stringToColor, getPriorityColor  } from '../utils/task.utils';
-import { PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS, ProjectStatus } from '../../projects/types/project.types';
-import { TaskPriority } from '../types/task.types';
-interface TaskDetailProps {
-    taskId: string;
+import { stringToColor, getPriorityColor } from '../utils/task.utils';
+import { PROJECT_STATUS_LABELS, PROJECT_STATUS_COLORS } from '../../projects/types/project.types';
+import { TaskDetailProps } from '../types/task-component.types';
+import { useTaskDetailController } from '../hooks/useTaskDetailController';
 
-}
-
-export const TaskDetail = ({ taskId }: TaskDetailProps) => {
-    const { projects } = useProjectStore();
-
-    
-    // Find the task in all projects
-    const taskData = useMemo(() => {
-        for (const project of projects) {
-            // Create task from project
-            const task: { stage: ProjectStatus; priority: TaskPriority; [key: string]: any } = {
-                id: project.id,
-                name: project.name,
-                stage: project.status,
-                priority: ((): TaskPriority => {
-                    const daysUntilDeadline = Math.ceil(
-                        (new Date(project.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-                    );
-                    if (daysUntilDeadline <= 7) return 'Critical';
-                    if (daysUntilDeadline <= 14) return 'High';
-                    if (daysUntilDeadline <= 30) return 'Medium';
-                    return 'Low';
-                })(),
-                endDate: project.endDate,
-                startDate: project.startDate,
-                assignedTo: project.members?.map((member: any) => ({
-                    name: member.name,
-                    avatar: member.avatar,
-                    role: member.role
-                })) || [],
-                completion: calculateProjectCompletion(project),
-                description: project.description,
-            };
-
-            if (task.id === taskId) {
-                return task;
-            }
-        }
-        return null;
-    }, [projects, taskId]);
-
-    const getInitials = (name: string) => {
-        return name
-            .split(' ')
-            .map(part => part[0])
-            .join('')
-            .toUpperCase()
-            .substring(0, 2);
-    };
+export const TaskDetail = ({ taskId, projectId }: TaskDetailProps) => {
+    const { taskData, getInitials } = useTaskDetailController({ taskId, projectId });
 
     if (!taskData) {
         return (
             <div className="p-6">
                 <h1 className="text-2xl font-bold text-gray-900 mb-4">Task Not Found</h1>
                 <Link
-                    href="/taskboard"
+                    href={projectId ? `/projects/${projectId}/task` : '/taskboard'}
                     className="text-blue-600 hover:underline flex items-center gap-2"
                 >
                     <ChevronLeft className="w-4 h-4" />
@@ -87,7 +37,7 @@ export const TaskDetail = ({ taskId }: TaskDetailProps) => {
             {/* Header with Back Button */}
             <div className="mb-6">
                 <Link
-                    href="/tasks"
+                    href={taskData.projectId ? `/projects/${taskData.projectId}/task` : '/taskboard'}
                     className="text-blue-600 hover:underline flex items-center gap-2 mb-4"
                 >
                     <ChevronLeft className="w-4 h-4" />
@@ -108,8 +58,8 @@ export const TaskDetail = ({ taskId }: TaskDetailProps) => {
                             <div>
                                 <label className="text-sm font-medium text-gray-600">Status</label>
                                 <div className="mt-2">
-                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${PROJECT_STATUS_COLORS[taskData.stage]}`}>
-                                        {PROJECT_STATUS_LABELS[taskData.stage]}
+                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${PROJECT_STATUS_COLORS[taskData.status]}`}>
+                                        {PROJECT_STATUS_LABELS[taskData.status]}
                                     </span>
                                 </div>
                             </div>
@@ -211,8 +161,8 @@ export const TaskDetail = ({ taskId }: TaskDetailProps) => {
                             <div>
                                 <label className="text-sm font-medium text-gray-600">Status</label>
                                 <div className="mt-1">
-                                    <span className={`px-2 py-1 rounded text-xs font-medium ${PROJECT_STATUS_COLORS[taskData.stage]}`}>
-                                        {PROJECT_STATUS_LABELS[taskData.stage]}
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${PROJECT_STATUS_COLORS[taskData.status]}`}>
+                                        {PROJECT_STATUS_LABELS[taskData.status]}
                                     </span>
                                 </div>
                             </div>

@@ -9,11 +9,15 @@ import { useProjectStore } from '../../projects/store/projectStore';
 import { Task } from '../types/task.types';
 import { getPriorityFromProject, calculateProjectCompletion } from '../utils/task.utils';
 
-export const useTasks = () => {
+export const useTasks = (projectId?: string) => {
     const { projects, selectedProject } = useProjectStore();
 
     return useMemo(() => {
-        const sourceProjects = selectedProject ? [selectedProject] : projects;
+        const sourceProjects = projectId
+            ? projects.filter((project) => project.id === projectId)
+            : selectedProject
+                ? [selectedProject]
+                : projects;
 
         // Flatten tasks from all projects into a single array
         const allTasks: Task[] = [];
@@ -63,5 +67,5 @@ export const useTasks = () => {
         });
 
         return allTasks;
-    }, [projects, selectedProject]);
+    }, [projects, selectedProject, projectId]);
 };

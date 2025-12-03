@@ -4,4 +4,5 @@ export * from './mockMilestone';
 export * from './mockProject';
 export * from './mockAttachment';
 export * from './mockBudget';
-export * from './mockProjectStats';
+export * from './mockBugReports';
+export * from './mockProjectStats'

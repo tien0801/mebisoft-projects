@@ -7,21 +7,54 @@
 
 'use client';
 
-import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
-import { useProjectStore } from '../store/projectStore';
-import { useMemo } from 'react';
+import { Suspense } from 'react';
+
+import { useBugReportController } from '../hooks/useBugReportController';
+import { BugReportToolbar } from './bug-report/BugReportToolbar';
+import { BugReportTable } from './bug-report/BugReportTable';
+import { CreateBugReportModal } from './modal/bug-report/CreateBugReportModal';
+import { AiGenerateModal } from './modal/bug-report/AiGenerateModal';
+import { BugReportHeader } from './bug-report/BugReportHeader';
 
 interface BugReportViewProps {
     projectId: string;
 }
 
-export const BugReportView = ({ projectId }: BugReportViewProps) => {
-    const { projects } = useProjectStore();
+const LoadingState = () => (
+    <div className="p-6">
+        <div className="h-6 w-48 rounded bg-gray-200 animate-pulse" />
+    </div>
+);
 
-    const project = useMemo(() => {
-        return projects.find(p => p.id === projectId);
-    }, [projects, projectId]);
+export const BugReportView = ({ projectId }: BugReportViewProps) => {
+    const {
+        project,
+        filteredBugs,
+        statusFilter,
+        setStatusFilter,
+        priorityFilter,
+        setPriorityFilter,
+        searchKeyword,
+        setSearchKeyword,
+        isCreateModalOpen,
+        openCreateModal,
+        closeCreateModal,
+        isAiModalOpen,
+        openAiModal,
+        closeAiModal,
+        formState,
+        updateFormState,
+        submitBugReport,
+        aiFormState,
+        updateAiFormState,
+        generateAiSuggestions,
+        aiResults,
+        applyAiResult,
+        assigneeOptions,
+        startEditBug,
+        deleteBug,
+        isEditing,
+    } = useBugReportController(projectId);
 
     if (!project) {
         return (
@@ -33,36 +66,51 @@ export const BugReportView = ({ projectId }: BugReportViewProps) => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white border-b border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                    <Link href={`/projects/${projectId}`} className="flex items-center gap-2 text-green-600 hover:text-green-700">
-                        <ChevronLeft className="w-4 h-4" />
-                        Back to Project
-                    </Link>
-                </div>
+            <Suspense fallback={<LoadingState />}>
+                <BugReportHeader projectId={projectId} projectName={project.name} />
+            </Suspense>
 
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Bug Report</h1>
-                <nav className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Link href="/dashboard" className="text-green-600 hover:underline">Dashboard</Link>
-                    <span className="text-gray-400">›</span>
-                    <Link href="/projects" className="text-green-600 hover:underline">Project</Link>
-                    <span className="text-gray-400">›</span>
-                    <Link href={`/projects/${projectId}`} className="text-green-600 hover:underline">{project.name}</Link>
-                    <span className="text-gray-400">›</span>
-                    <span className="text-gray-900">Bug Report</span>
-                </nav>
-            </div>
-
-            {/* Content */}
             <div className="p-6">
-                <div className="bg-white rounded-lg shadow p-6 min-h-96">
-                    <div className="text-center text-gray-500">
-                        <p className="mb-4">Bug Report View</p>
-                        <p className="text-sm">Project: {project.name}</p>
-                    </div>
+                <div className="rounded-2xl bg-white p-6 shadow-lg">
+                    <BugReportToolbar
+                        totalCount={filteredBugs.length}
+                        statusFilter={statusFilter}
+                        onStatusChange={setStatusFilter}
+                        priorityFilter={priorityFilter}
+                        onPriorityChange={setPriorityFilter}
+                        searchKeyword={searchKeyword}
+                        onSearchChange={setSearchKeyword}
+                        onAddBug={openCreateModal}
+                    />
+
+                    <BugReportTable
+                        bugs={filteredBugs}
+                        onEdit={startEditBug}
+                        onDelete={deleteBug}
+                    />
                 </div>
             </div>
+
+            <CreateBugReportModal
+                isOpen={isCreateModalOpen}
+                onClose={closeCreateModal}
+                onSubmit={submitBugReport}
+                onOpenAi={openAiModal}
+                formState={formState}
+                updateFormState={updateFormState}
+                assigneeOptions={assigneeOptions}
+                isEditing={isEditing}
+            />
+
+            <AiGenerateModal
+                isOpen={isAiModalOpen}
+                onClose={closeAiModal}
+                formState={aiFormState}
+                updateFormState={updateAiFormState}
+                onGenerate={generateAiSuggestions}
+                results={aiResults}
+                onApplyResult={applyAiResult}
+            />
         </div>
     );
 };

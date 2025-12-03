@@ -7,74 +7,35 @@
 
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { Plus, ListChecks, Search, Paperclip, MessageSquare } from 'lucide-react';
+import { Fragment } from 'react';
+import { Plus, ListChecks, Search, Paperclip, MessageSquare, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { useProjectStore } from '../../projects/store/projectStore';
 import { ProjectToolbar } from '../../projects/components/ProjectToolbar';
-import { useTaskStore } from '../store/taskStore';
-import { useTasks } from '../hooks/useTasks';
-import { Task, ViewMode, SortOption } from '../types/task.types';
 import { ProjectStatus } from '../../projects/types/project.types';
-import {
-    stringToColor,
-    getPriorityColor
-} from '../utils/task.utils';
+import { stringToColor, getPriorityColor } from '../utils/task.utils';
+import { useTaskListController } from '../hooks/useTaskListController';
 
-export const TaskList = () => {
-    const { selectedProject } = useProjectStore();
-    const tasks = useTasks();
+import { TaskListProps } from '../types/task-component.types';
+
+export const TaskList = ({ projectId }: TaskListProps) => {
     const {
-        viewMode, setViewMode,
-        sortBy, setSortBy,
-        statusFilter, setStatusFilter,
-        searchQuery, setSearchQuery
-    } = useTaskStore();
-
-    useEffect(() => {
-        // You might want to initialize tasks in the store here
-        // For now, we are deriving them directly in the component
-    }, [tasks]);
-
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value);
-    };
-
-    const filteredAndSortedTasks = useMemo(() => {
-        let filteredTasks = [...tasks];
-
-        if (statusFilter && statusFilter !== 'all') {
-            filteredTasks = filteredTasks.filter((task: Task) => task.stage === statusFilter);
-        }
-
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase().trim();
-            filteredTasks = filteredTasks.filter((task: Task) => {
-                const matchesName = task.name.toLowerCase().includes(query);
-                const matchesAssignee = task.assignedTo?.some(
-                    (user: { name: string }) => user?.name?.toLowerCase().includes(query)
-                );
-                return matchesName || matchesAssignee;
-            });
-        }
-
-        return [...filteredTasks].sort((a: Task, b: Task) => {
-            switch (sortBy) {
-                case 'newest':
-                    return new Date(b.endDate).getTime() - new Date(a.endDate).getTime();
-                case 'oldest':
-                    return new Date(a.endDate).getTime() - new Date(b.endDate).getTime();
-                case 'a-z':
-                    return a.name.localeCompare(b.name);
-                case 'z-a':
-                    return b.name.localeCompare(a.name);
-                default:
-                    return 0;
-            }
-        });
-    }, [tasks, statusFilter, searchQuery, sortBy]);
-
-    const projectName = selectedProject?.name || 'Project Tasks';
+        projectName,
+        viewMode,
+        setViewMode,
+        sortBy,
+        setSortBy,
+        statusFilter,
+        handleStatusFilterChange,
+        searchQuery,
+        handleSearchChange,
+        filteredAndSortedTasks,
+        groupedProjects,
+        tasksCount,
+        filteredCount,
+        expandedProjects,
+        toggleProjectExpansion,
+        getInitials,
+    } = useTaskListController(projectId);
 
     return (
         <div className="p-6">
@@ -108,7 +69,7 @@ export const TaskList = () => {
                     sortBy={sortBy}
                     onSortChange={setSortBy}
                     statusFilter={statusFilter}
-                    onStatusFilterChange={(newStatus) => setStatusFilter(newStatus as ProjectStatus | 'all')}
+                    onStatusFilterChange={handleStatusFilterChange}
                     onCreateClick={() => {
                         console.log('Create new task');
                     }}
@@ -131,7 +92,7 @@ export const TaskList = () => {
             <div className="bg-white rounded-lg shadow overflow-hidden">
                 <div className="p-4 border-b flex justify-between items-center">
                     <div className="text-sm font-medium text-gray-700">
-                        {filteredAndSortedTasks.length} of {tasks.length} tasks
+                        {filteredCount} of {tasksCount} tasks
                     </div>
                     <button className="p-1 text-gray-500 hover:text-gray-700">
                         <ListChecks className="w-4 h-4" />
@@ -143,119 +104,151 @@ export const TaskList = () => {
                         <thead className="bg-gray-50">
                             <tr>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Name
+                                    Project
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Stage
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Priority
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    End Date
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Assigned To
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-64">
-                                    Completion
-                                </th>
-                                <th scope="col" className="relative px-6 py-3">
-                                    <span className="sr-only">Actions</span>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider" colSpan={6}>
+                                    Details
                                 </th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredAndSortedTasks.map((task) => (
-                                <tr key={task.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div>
-                                            <Link href={`/projects/${task.projectId}/tasks/${task.id}`} className="text-sm font-medium text-gray-900 hover:text-blue-600">
-                                                {task.name}
-                                            </Link>
-                                            <p className="text-xs text-gray-500 mt-1">{task.projectName}</p>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${task.stage === ProjectStatus.IN_PROGRESS ? 'bg-blue-100 text-blue-800' :
-                                            task.stage === ProjectStatus.PLANNING ? 'bg-gray-100 text-gray-800' :
-                                                task.stage === ProjectStatus.COMPLETED ? 'bg-green-100 text-green-800' :
-                                                    'bg-purple-100 text-purple-800'}`}>
-                                            {task.stage.replace('_', ' ').toLowerCase().replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
-                                            {task.priority}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {new Date(task.endDate).toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: '2-digit',
-                                            day: '2-digit',
-                                        })}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex flex-wrap gap-2">
-                                            {task.assignedTo.map((user: { name: string; avatar?: string }, idx: number) => {
-                                                const getInitials = (name: string) => {
-                                                    return name
-                                                        .split(' ')
-                                                        .map(part => part[0])
-                                                        .join('')
-                                                        .toUpperCase()
-                                                        .substring(0, 2);
-                                                };
-                                                const initials = user.name === 'Unassigned' ? 'U' : getInitials(user.name);
-                                                return (
-                                                    <div key={idx} className="relative">
-                                                        <div
-                                                            className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium text-gray-700 overflow-hidden border border-gray-200"
-                                                            style={{
-                                                                backgroundColor: stringToColor(user.name)
-                                                            }}
-                                                        >
-                                                            <span className="text-xs font-medium">{initials}</span>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="w-full mr-2">
-                                                <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                                    <div
-                                                        className={`h-1.5 rounded-full ${task.completion < 50 ? 'bg-red-500' :
-                                                            task.completion < 80 ? 'bg-yellow-500' :
-                                                                'bg-green-500'}`}
-                                                        style={{ width: `${task.completion}%` }}
-                                                    ></div>
-                                                </div>
-                                            </div>
-                                            <span className="text-xs text-gray-500">{task.completion}%</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="flex items-center text-gray-400">
-                                                <Paperclip className="h-4 w-4 mr-1" />
-                                                <span className="text-xs">0</span>
-                                            </div>
-                                            <div className="flex items-center text-gray-400">
-                                                <MessageSquare className="h-4 w-4 mr-1" />
-                                                <span className="text-xs">0</span>
-                                            </div>
-                                            <div className="flex items-center text-gray-400">
-                                                <ListChecks className="h-4 w-4 mr-1" />
-                                                <span className="text-xs">0/0</span>
-                                            </div>
-                                        </div>
+                            {groupedProjects.length === 0 && (
+                                <tr>
+                                    <td colSpan={7} className="px-6 py-8 text-center text-sm text-gray-500">
+                                        No tasks match the current filters.
                                     </td>
                                 </tr>
-                            ))}
+                            )}
+                            {groupedProjects.map((project) => {
+                                const isExpanded = expandedProjects.includes(project.projectId);
+                                return (
+                                    <Fragment key={project.projectId}>
+                                        <tr
+                                            className="hover:bg-gray-50 cursor-pointer"
+                                            onClick={() => toggleProjectExpansion(project.projectId)}
+                                        >
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    <ChevronRight
+                                                        className={`h-4 w-4 mr-3 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                                                    />
+                                                    <div>
+                                                        <Link
+                                                            href={`/projects/${project.projectId}`}
+                                                            className="text-sm font-semibold text-gray-900 hover:text-blue-600"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            {project.projectName}
+                                                        </Link>
+                                                        <p className="text-xs text-gray-500">{project.tasks.length} {project.tasks.length === 1 ? 'task' : 'tasks'}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td colSpan={6} className="px-6 py-4 text-sm text-gray-500">
+                                                Click to {isExpanded ? 'hide' : 'view'} {project.tasks.length ? 'task details' : 'details'}
+                                            </td>
+                                        </tr>
+                                        {isExpanded && (
+                                            <tr className="bg-gray-100 text-[11px] font-semibold text-gray-500 tracking-wider uppercase">
+                                                <td className="px-6 py-2 pl-16">Name</td>
+                                                <td className="px-6 py-2">Stage</td>
+                                                <td className="px-6 py-2">Priority</td>
+                                                <td className="px-6 py-2">End Date</td>
+                                                <td className="px-6 py-2">Assigned To</td>
+                                                <td className="px-6 py-2">Completion</td>
+                                                <td className="px-6 py-2">Actions</td>
+                                            </tr>
+                                        )}
+                                        {isExpanded && project.tasks.map((task) => (
+                                            <tr key={`${project.projectId}-${task.id}`} className="bg-gray-50">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-start space-x-3 pl-6">
+                                                        <div className="mt-2 h-2 w-2 rounded-full bg-blue-500" />
+                                                        <div>
+                                                            <Link
+                                                                href={`/projects/${task.projectId}/task?highlight=${task.id}`}
+                                                                className="text-sm font-medium text-gray-900 hover:text-blue-600"
+                                                            >
+                                                                {task.name}
+                                                            </Link>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${task.stage === ProjectStatus.IN_PROGRESS ? 'bg-blue-100 text-blue-800' :
+                                                        task.stage === ProjectStatus.PLANNING ? 'bg-gray-100 text-gray-800' :
+                                                            task.stage === ProjectStatus.COMPLETED ? 'bg-green-100 text-green-800' :
+                                                                'bg-purple-100 text-purple-800'}`}>
+                                                        {task.stage.replace('_', ' ').toLowerCase().replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+                                                        {task.priority}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {new Date(task.endDate).toLocaleDateString('en-US', {
+                                                        year: 'numeric',
+                                                        month: '2-digit',
+                                                        day: '2-digit',
+                                                    })}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {task.assignedTo.map((user: { name: string; avatar?: string }, idx: number) => {
+                                                            const initials = user.name === 'Unassigned' ? 'U' : getInitials(user.name);
+                                                            return (
+                                                                <div key={idx} className="relative">
+                                                                    <div
+                                                                        className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium text-gray-700 overflow-hidden border border-gray-200"
+                                                                        style={{
+                                                                            backgroundColor: stringToColor(user.name)
+                                                                        }}
+                                                                    >
+                                                                        <span className="text-xs font-medium">{initials}</span>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <div className="w-full mr-2">
+                                                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                                                <div
+                                                                    className={`h-1.5 rounded-full ${task.completion < 50 ? 'bg-red-500' :
+                                                                        task.completion < 80 ? 'bg-yellow-500' :
+                                                                            'bg-green-500'}`}
+                                                                    style={{ width: `${task.completion}%` }}
+                                                                ></div>
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-xs text-gray-500">{task.completion}%</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center space-x-4">
+                                                        <div className="flex items-center text-gray-400">
+                                                            <Paperclip className="h-4 w-4 mr-1" />
+                                                            <span className="text-xs">0</span>
+                                                        </div>
+                                                        <div className="flex items-center text-gray-400">
+                                                            <MessageSquare className="h-4 w-4 mr-1" />
+                                                            <span className="text-xs">0</span>
+                                                        </div>
+                                                        <div className="flex items-center text-gray-400">
+                                                            <ListChecks className="h-4 w-4 mr-1" />
+                                                            <span className="text-xs">0/0</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </Fragment>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
