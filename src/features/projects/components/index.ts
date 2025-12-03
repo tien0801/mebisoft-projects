@@ -6,3 +6,8 @@ export * from './ProjectDetail';
 export * from './ProjectBudget';
 export * from './modal';
 export * from './ProjectReports';
+export * from './TrackerView';
+export * from './TimesheetView';
+export * from './ExpenseView';
+export * from './GanttChartView';
+export * from './BugReportView';

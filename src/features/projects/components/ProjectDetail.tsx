@@ -7,9 +7,11 @@
 
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useProjectStore } from '../store';
 import { calculateProjectCompletion } from '../../tasks/utils/task.utils';
+
 import {
   ProjectHeader,
   ProjectStatsCards,
@@ -18,7 +20,7 @@ import {
   ProjectMembersSection,
   ProjectMilestonesSection,
   ProjectActivityLog,
-  ProjectAttachments
+  ProjectAttachments,
 } from './project-detail';
 import { CreateProjectMemberModal } from './modal';
 import { ProjectBudget } from './ProjectBudget';
@@ -27,9 +29,12 @@ interface ProjectDetailProps {
   projectId: string;
 }
 
+type ProjectDetailTab = 'overview' | 'gantt' | 'budget' | 'timesheet' | 'bug' | 'task';
+
 export const ProjectDetail = ({ projectId }: ProjectDetailProps) => {
   const { projects } = useProjectStore();
-  const [activeTab, setActiveTab] = useState<'overview' | 'gantt' | 'budget' | 'timesheet' | 'bug' | 'task'>('overview');
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<ProjectDetailTab>('overview');
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
 
   const project = useMemo(() => {
@@ -44,6 +49,8 @@ export const ProjectDetail = ({ projectId }: ProjectDetailProps) => {
     );
   }
 
+  const budgetContent = <ProjectBudget projectId={projectId} />;
+
   const completion = calculateProjectCompletion(project);
 
   const handleAddMember = (userId: string) => {
@@ -51,82 +58,62 @@ export const ProjectDetail = ({ projectId }: ProjectDetailProps) => {
     // TODO: Implement add member logic with store
   };
 
-  // Render content based on active tab
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'budget':
-        return <ProjectBudget projectId={projectId} />;
-      
-      case 'gantt':
-        return (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Gantt Chart</h2>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
-        );
-      
-      case 'timesheet':
-        return (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Timesheet</h2>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
-        );
-      
-      case 'bug':
-        return (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Bug Report</h2>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
-        );
-      
-      case 'task':
-        return (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Task Management</h2>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
-        );
-      
-      default: // overview
-        return (
-          <>
-            <ProjectStatsCards />
+  const handleTabChange = useCallback(
+    (tab: ProjectDetailTab) => {
+      if (tab === 'overview' || tab === 'budget') {
+        setActiveTab(tab);
+        return;
+      }
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-              <ProjectInfoCard project={project} completion={completion} />
-              <ProjectStatisticsGrid />
-            </div>
+      const tabRoutes: Record<ProjectDetailTab, string> = {
+        overview: `/projects/${projectId}`,
+        gantt: `/projects/${projectId}/gantt`,
+        budget: `/projects/${projectId}/budget`,
+        timesheet: `/projects/${projectId}/timesheet`,
+        bug: `/projects/${projectId}/bug`,
+        task: `/projects/${projectId}/task`,
+      };
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ProjectMembersSection 
-                members={project.members} 
-                onAddMember={() => setIsAddMemberModalOpen(true)}
-              />
-              <ProjectMilestonesSection milestoneCount={project.members?.length || 0} />
-            </div>
+      router.push(tabRoutes[tab]);
+    },
+    [projectId, router]
+  );
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-              <ProjectActivityLog />
-              <ProjectAttachments />
-            </div>
-          </>
-        );
-    }
-  };
+  const overviewContent = (
+    <>
+      <ProjectStatsCards />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <ProjectInfoCard project={project} completion={completion} />
+        <ProjectStatisticsGrid />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ProjectMembersSection
+          members={project.members}
+          onAddMember={() => setIsAddMemberModalOpen(true)}
+        />
+        <ProjectMilestonesSection milestoneCount={project.members?.length || 0} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <ProjectActivityLog />
+        <ProjectAttachments />
+      </div>
+    </>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ProjectHeader 
-        projectId={projectId} 
-        projectName={project.name} 
+      <ProjectHeader
+        projectId={projectId}
+        projectName={project.name}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
       />
 
       <div className="p-6">
-        {renderTabContent()}
+        {activeTab === 'budget' ? budgetContent : overviewContent}
       </div>
 
       <CreateProjectMemberModal
