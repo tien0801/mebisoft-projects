@@ -26,29 +26,29 @@ type MenuItem = {
 export const menuItems: MenuItem[] = [
   // Dashboard với submenu
   { name: 'Dashboard', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
-  { name: 'Accounting', href: '/dashboard/accounting', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
-  { name: 'HRM', href: '/dashboard/hrm', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
-  { name: 'CRM', href: '/dashboard/crm', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
+  // { name: 'Accounting', href: '/dashboard/accounting', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
+  // { name: 'HRM', href: '/dashboard/hrm', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
+  // { name: 'CRM', href: '/dashboard/crm', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
   { name: 'Project', href: '/dashboard', iconPath: '/images/sidebar/Project_system.svg', group: 'Dashboard' },
-  { name: 'POS', href: '/dashboard/pos', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
+  // { name: 'POS', href: '/dashboard/pos', iconPath: '/images/sidebar/hrm_system.svg', group: 'Dashboard' },
   
   // HRM System
-  { name: 'HRM System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
-  { name: 'Employees', href: '/hrm/employees', iconPath: '/images/sidebar/hrm_system.svg', group: 'HRM System' },
-  { name: 'Attendance', href: '/hrm/attendance', iconPath: '/images/sidebar/hrm_system.svg', group: 'HRM System' },
-  { name: 'Payroll', href: '/hrm/payroll', iconPath: '/images/sidebar/hrm_system.svg', group: 'HRM System' },
+  // { name: 'HRM System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Employees', href: '/hrm/employees', iconPath: '/images/sidebar/hrm_system.svg', group: 'HRM System' },
+  // { name: 'Attendance', href: '/hrm/attendance', iconPath: '/images/sidebar/hrm_system.svg', group: 'HRM System' },
+  // { name: 'Payroll', href: '/hrm/payroll', iconPath: '/images/sidebar/hrm_system.svg', group: 'HRM System' },
   
   // Accounting System
-  { name: 'Accounting System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
-  { name: 'Invoices', href: '/accounting/invoices', iconPath: '/images/sidebar/hrm_system.svg', group: 'Accounting System' },
-  { name: 'Expenses', href: '/accounting/expenses', iconPath: '/images/sidebar/hrm_system.svg', group: 'Accounting System' },
-  { name: 'Reports', href: '/accounting/reports', iconPath: '/images/sidebar/hrm_system.svg', group: 'Accounting System' },
+  // { name: 'Accounting System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Invoices', href: '/accounting/invoices', iconPath: '/images/sidebar/hrm_system.svg', group: 'Accounting System' },
+  // { name: 'Expenses', href: '/accounting/expenses', iconPath: '/images/sidebar/hrm_system.svg', group: 'Accounting System' },
+  // { name: 'Reports', href: '/accounting/reports', iconPath: '/images/sidebar/hrm_system.svg', group: 'Accounting System' },
   
   // CRM System
-  { name: 'CRM System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
-  { name: 'Leads', href: '/crm/leads', iconPath: '/images/sidebar/hrm_system.svg', group: 'CRM System' },
-  { name: 'Customers', href: '/crm/customers', iconPath: '/images/sidebar/hrm_system.svg', group: 'CRM System' },
-  { name: 'Deals', href: '/crm/deals', iconPath: '/images/sidebar/hrm_system.svg', group: 'CRM System' },
+  // { name: 'CRM System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Leads', href: '/crm/leads', iconPath: '/images/sidebar/hrm_system.svg', group: 'CRM System' },
+  // { name: 'Customers', href: '/crm/customers', iconPath: '/images/sidebar/hrm_system.svg', group: 'CRM System' },
+  // { name: 'Deals', href: '/crm/deals', iconPath: '/images/sidebar/hrm_system.svg', group: 'CRM System' },
   
   // Project System
   { name: 'Project System', href: '#', iconPath: '/images/sidebar/Project_system.svg' },
@@ -57,40 +57,40 @@ export const menuItems: MenuItem[] = [
   { name: 'Timesheet', href: '/timesheet', iconPath: '/images/sidebar/Project_system.svg', group: 'Project System' },
   
   // User Management
-  { name: 'User Management', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
-  { name: 'Users', href: '/users', iconPath: '/images/sidebar/hrm_system.svg', group: 'User Management' },
-  { name: 'Roles', href: '/users/roles', iconPath: '/images/sidebar/hrm_system.svg', group: 'User Management' },
-  { name: 'Permissions', href: '/users/permissions', iconPath: '/images/sidebar/hrm_system.svg', group: 'User Management' },
+  // { name: 'User Management', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Users', href: '/users', iconPath: '/images/sidebar/hrm_system.svg', group: 'User Management' },
+  // { name: 'Roles', href: '/users/roles', iconPath: '/images/sidebar/hrm_system.svg', group: 'User Management' },
+  // { name: 'Permissions', href: '/users/permissions', iconPath: '/images/sidebar/hrm_system.svg', group: 'User Management' },
   
   // Products System
-  { name: 'Products System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
-  { name: 'Products', href: '/products', iconPath: '/images/sidebar/hrm_system.svg', group: 'Products System' },
-  { name: 'Categories', href: '/products/categories', iconPath: '/images/sidebar/hrm_system.svg', group: 'Products System' },
-  { name: 'Inventory', href: '/products/inventory', iconPath: '/images/sidebar/hrm_system.svg', group: 'Products System' },
+  // { name: 'Products System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Products', href: '/products', iconPath: '/images/sidebar/hrm_system.svg', group: 'Products System' },
+  // { name: 'Categories', href: '/products/categories', iconPath: '/images/sidebar/hrm_system.svg', group: 'Products System' },
+  // { name: 'Inventory', href: '/products/inventory', iconPath: '/images/sidebar/hrm_system.svg', group: 'Products System' },
   
   // POS System
-  { name: 'POS System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
-  { name: 'Point of Sale', href: '/pos', iconPath: '/images/sidebar/hrm_system.svg', group: 'POS System' },
-  { name: 'Orders', href: '/pos/orders', iconPath: '/images/sidebar/hrm_system.svg', group: 'POS System' },
-  { name: 'Receipts', href: '/pos/receipts', iconPath: '/images/sidebar/hrm_system.svg', group: 'POS System' },
+  // { name: 'POS System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Point of Sale', href: '/pos', iconPath: '/images/sidebar/hrm_system.svg', group: 'POS System' },
+  // { name: 'Orders', href: '/pos/orders', iconPath: '/images/sidebar/hrm_system.svg', group: 'POS System' },
+  // { name: 'Receipts', href: '/pos/receipts', iconPath: '/images/sidebar/hrm_system.svg', group: 'POS System' },
   
   // Support System
-  { name: 'Support System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
-  { name: 'Tickets', href: '/support/tickets', iconPath: '/images/sidebar/hrm_system.svg', group: 'Support System' },
-  { name: 'Knowledge Base', href: '/support/kb', iconPath: '/images/sidebar/hrm_system.svg', group: 'Support System' },
-  { name: 'FAQ', href: '/support/faq', iconPath: '/images/sidebar/hrm_system.svg', group: 'Support System' },
+  // { name: 'Support System', href: '#', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Tickets', href: '/support/tickets', iconPath: '/images/sidebar/hrm_system.svg', group: 'Support System' },
+  // { name: 'Knowledge Base', href: '/support/kb', iconPath: '/images/sidebar/hrm_system.svg', group: 'Support System' },
+  // { name: 'FAQ', href: '/support/faq', iconPath: '/images/sidebar/hrm_system.svg', group: 'Support System' },
   
   // Zoom Meeting
-  { name: 'Zoom Meeting', href: '/zoom', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Zoom Meeting', href: '/zoom', iconPath: '/images/sidebar/hrm_system.svg' },
   
   // Messenger
-  { name: 'Messenger', href: '/messenger', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Messenger', href: '/messenger', iconPath: '/images/sidebar/hrm_system.svg' },
   
   // Notification Template
-  { name: 'Notification Template', href: '/notifications', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Notification Template', href: '/notifications', iconPath: '/images/sidebar/hrm_system.svg' },
   
   // Settings
-  { name: 'Settings', href: '/settings', iconPath: '/images/sidebar/hrm_system.svg' },
+  // { name: 'Settings', href: '/settings', iconPath: '/images/sidebar/hrm_system.svg' },
 ];
 
 export function Sidebar() {
